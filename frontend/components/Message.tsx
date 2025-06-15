@@ -45,6 +45,7 @@ function PureMessage({
               key={key}
               reasoning={part.reasoning}
               id={message.id}
+              thinkingTime={(part as any).thinkingTime}
             />
           );
         }

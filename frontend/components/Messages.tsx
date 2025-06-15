@@ -15,6 +15,7 @@ function PureMessages({
   error,
   stop,
   registerRef,
+  startTime,
 }: {
   threadId: string;
   messages: UIMessage[];
@@ -24,6 +25,7 @@ function PureMessages({
   error: UseChatHelpers['error'];
   stop: UseChatHelpers['stop'];
   registerRef: (id: string, ref: HTMLDivElement | null) => void;
+  startTime?: number | null;
 }) {
   return (
     <section className="flex flex-col space-y-12">
@@ -39,7 +41,7 @@ function PureMessages({
           stop={stop}
         />
       ))}
-      {status === 'submitted' && <MessageLoading />}
+      {status === 'submitted' && <MessageLoading startTime={startTime || undefined} />}
       {error && <Error message={error.message} />}
     </section>
   );

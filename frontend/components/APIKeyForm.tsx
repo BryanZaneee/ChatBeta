@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FieldError, useForm, UseFormRegister } from 'react-hook-form';
@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/frontend/components/ui/card';
-import { Key } from 'lucide-react';
+import { Key, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAPIKeyStore } from '@/frontend/stores/APIKeyStore';
 import { Badge } from './ui/badge';
@@ -38,7 +38,7 @@ export default function APIKeyForm() {
           <CardTitle>Add Your API Keys To Start Chatting</CardTitle>
         </div>
         <CardDescription>
-          Keys are stored locally in your browser.
+          Keys are stored locally in your browser and validated for correct format.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -49,13 +49,14 @@ export default function APIKeyForm() {
 }
 
 const Form = () => {
-  const { keys, setKeys } = useAPIKeyStore();
+  const { keys, setKeys, validateApiKey } = useAPIKeyStore();
 
   const {
     register,
     handleSubmit,
     formState: { errors, isDirty },
     reset,
+    watch,
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: keys,
@@ -67,10 +68,27 @@ const Form = () => {
 
   const onSubmit = useCallback(
     (values: FormValues) => {
+      // Validate all keys before saving
+      const validationErrors: string[] = [];
+      
+      Object.entries(values).forEach(([provider, key]) => {
+        if (key && key.trim()) {
+          const validation = validateApiKey(provider as any, key);
+          if (!validation.isValid) {
+            validationErrors.push(`${provider}: ${validation.error}`);
+          }
+        }
+      });
+
+      if (validationErrors.length > 0) {
+        toast.error(`API Key Validation Errors:\n${validationErrors.join('\n')}`);
+        return;
+      }
+
       setKeys(values);
       toast.success('API keys saved successfully');
     },
-    [setKeys]
+    [setKeys, validateApiKey]
   );
 
   return (
@@ -83,6 +101,8 @@ const Form = () => {
         placeholder="AIza..."
         register={register}
         error={errors.google}
+        validateApiKey={validateApiKey}
+        watch={watch}
         required
       />
 
@@ -91,19 +111,23 @@ const Form = () => {
         label="OpenRouter API Key"
         models={['DeepSeek R1 0538', 'DeepSeek-V3']}
         linkUrl="https://openrouter.ai/settings/keys"
-        placeholder="sk-or-..."
+        placeholder="sk-or-... or sk-... (DeepSeek)"
         register={register}
         error={errors.openrouter}
+        validateApiKey={validateApiKey}
+        watch={watch}
       />
 
       <ApiKeyField
         id="openai"
         label="OpenAI API Key"
-        models={['GPT-4o', 'GPT-4.1-mini']}
+        models={['GPT-4o', 'GPT-4o-mini', 'OpenAI o3-mini (Tier 3+ required)']}
         linkUrl="https://platform.openai.com/settings/organization/api-keys"
         placeholder="sk-..."
         register={register}
         error={errors.openai}
+        validateApiKey={validateApiKey}
+        watch={watch}
       />
 
       <ApiKeyField
@@ -114,6 +138,8 @@ const Form = () => {
         placeholder="sk-ant-..."
         register={register}
         error={errors.anthropic}
+        validateApiKey={validateApiKey}
+        watch={watch}
       />
 
       <ApiKeyField
@@ -124,6 +150,8 @@ const Form = () => {
         placeholder="xai-..."
         register={register}
         error={errors.xai}
+        validateApiKey={validateApiKey}
+        watch={watch}
       />
 
       <Button type="submit" className="w-full" disabled={!isDirty}>
@@ -133,58 +161,121 @@ const Form = () => {
   );
 };
 
-interface ApiKeyFieldProps {
-  id: string;
-  label: string;
-  linkUrl: string;
-  models: string[];
-  placeholder: string;
-  error?: FieldError | undefined;
-  required?: boolean;
-  register: UseFormRegister<FormValues>;
-}
-
 const ApiKeyField = ({
   id,
   label,
+  models,
   linkUrl,
   placeholder,
-  models,
-  error,
-  required,
   register,
-}: ApiKeyFieldProps) => (
-  <div className="flex flex-col gap-2">
-    <label
-      htmlFor={id}
-      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex gap-1"
-    >
-      <span>{label}</span>
-      {required && <span className="text-muted-foreground"> (Required)</span>}
-    </label>
-    <div className="flex gap-2 flex-wrap">
-      {models.map((model) => (
-        <Badge key={model}>{model}</Badge>
-      ))}
+  error,
+  validateApiKey,
+  watch,
+  required = false,
+}: {
+  id: string;
+  label: string;
+  models: string[];
+  linkUrl: string;
+  placeholder: string;
+  register: UseFormRegister<FormValues>;
+  error?: FieldError;
+  validateApiKey: (provider: any, key: string) => { isValid: boolean; error?: string };
+  watch: any;
+  required?: boolean;
+}) => {
+  const [validationStatus, setValidationStatus] = useState<{
+    status: 'idle' | 'valid' | 'invalid';
+    message?: string;
+  }>({ status: 'idle' });
+
+  const currentValue = watch(id);
+
+  useEffect(() => {
+    if (!currentValue || !currentValue.trim()) {
+      setValidationStatus({ status: 'idle' });
+      return;
+    }
+
+    const validation = validateApiKey(id, currentValue);
+    setValidationStatus({
+      status: validation.isValid ? 'valid' : 'invalid',
+      message: validation.error,
+    });
+  }, [currentValue, validateApiKey, id]);
+
+  const getValidationIcon = () => {
+    switch (validationStatus.status) {
+      case 'valid':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'invalid':
+        return <XCircle className="h-4 w-4 text-red-500" />;
+      default:
+        return null;
+    }
+  };
+
+  const getValidationMessage = () => {
+    if (validationStatus.status === 'invalid' && validationStatus.message) {
+      return (
+        <div className="flex items-center gap-1 text-sm text-red-500 mt-1">
+          <AlertCircle className="h-3 w-3" />
+          {validationStatus.message}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <label htmlFor={id} className="text-sm font-medium">
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        <a
+          href={linkUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-muted-foreground hover:underline"
+        >
+          Get API Key
+        </a>
+      </div>
+      <div className="relative">
+        <Input
+          id={id}
+          type="password"
+          placeholder={placeholder}
+          {...register(id as keyof FormValues)}
+          className={`pr-8 ${
+            validationStatus.status === 'valid' 
+              ? 'border-green-500' 
+              : validationStatus.status === 'invalid' 
+                ? 'border-red-500' 
+                : ''
+          }`}
+        />
+        {getValidationIcon() && (
+          <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+            {getValidationIcon()}
+          </div>
+        )}
+      </div>
+      {getValidationMessage()}
+      {error && (
+        <div className="flex items-center gap-1 text-sm text-red-500">
+          <AlertCircle className="h-3 w-3" />
+          {error.message}
+        </div>
+      )}
+      <div className="flex flex-wrap gap-1">
+        {models.map((model) => (
+          <Badge key={model} variant="secondary" className="text-xs">
+            {model}
+          </Badge>
+        ))}
+      </div>
     </div>
-
-    <Input
-      id={id}
-      placeholder={placeholder}
-      {...register(id as keyof FormValues)}
-      className={error ? 'border-red-500' : ''}
-    />
-
-    <a
-      href={linkUrl}
-      target="_blank"
-      className="text-sm text-blue-500 inline w-fit"
-    >
-      Create {label.split(' ')[0]} API Key
-    </a>
-
-    {error && (
-      <p className="text-[0.8rem] font-medium text-red-500">{error.message}</p>
-    )}
-  </div>
-);
+  );
+};

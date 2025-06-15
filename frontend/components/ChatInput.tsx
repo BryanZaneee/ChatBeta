@@ -188,15 +188,57 @@ const ChatInput = memo(PureChatInput, (prevProps, nextProps) => {
 
 const PureChatModelDropdown = () => {
   const getKey = useAPIKeyStore((state) => state.getKey);
+  const isKeyValid = useAPIKeyStore((state) => state.isKeyValid);
+  const validateApiKey = useAPIKeyStore((state) => state.validateApiKey);
   const { selectedModel, setModel } = useModelStore();
 
   const isModelEnabled = useCallback(
     (model: AIModel) => {
       const modelConfig = getModelConfig(model);
       const apiKey = getKey(modelConfig.provider);
-      return !!apiKey;
+      const keyValid = isKeyValid(modelConfig.provider);
+      return !!apiKey && keyValid;
     },
-    [getKey]
+    [getKey, isKeyValid]
+  );
+
+  const getModelStatus = useCallback(
+    (model: AIModel) => {
+      const modelConfig = getModelConfig(model);
+      const apiKey = getKey(modelConfig.provider);
+      const keyValid = isKeyValid(modelConfig.provider);
+      
+      if (!apiKey) {
+        return { status: 'no-key', message: `No ${modelConfig.provider} API key` };
+      }
+      if (!keyValid) {
+        return { status: 'invalid-key', message: `Invalid ${modelConfig.provider} API key` };
+      }
+      return { status: 'available', message: 'Available' };
+    },
+    [getKey, isKeyValid]
+  );
+
+  const handleModelSelect = useCallback(
+    (model: AIModel) => {
+      const modelConfig = getModelConfig(model);
+      const apiKey = getKey(modelConfig.provider);
+      
+      if (!apiKey) {
+        toast.error(`Please add your ${modelConfig.provider} API key in settings to use ${model}`);
+        return;
+      }
+      
+      const validation = validateApiKey(modelConfig.provider, apiKey);
+      if (!validation.isValid) {
+        toast.error(`Invalid ${modelConfig.provider} API key: ${validation.error}`);
+        return;
+      }
+      
+      setModel(model);
+      toast.success(`Switched to ${model}`);
+    },
+    [getKey, validateApiKey, setModel]
   );
 
   return (
@@ -223,19 +265,29 @@ const PureChatModelDropdown = () => {
           <DropdownMenuLabel>🧠 Reasoning Models</DropdownMenuLabel>
           {REASONING_MODELS.map((model) => {
             const isEnabled = isModelEnabled(model);
+            const status = getModelStatus(model);
             return (
               <DropdownMenuItem
                 key={model}
-                onSelect={() => isEnabled && setModel(model)}
-                disabled={!isEnabled}
+                onSelect={() => handleModelSelect(model)}
                 className={cn(
                   'flex items-center justify-between gap-2',
                   'cursor-pointer'
                 )}
+                title={status.message}
               >
                 <div className="flex items-center gap-2">
-                  <span>{model}</span>
+                  <span className={!isEnabled ? 'text-muted-foreground' : ''}>{model}</span>
                   <span className="text-xs bg-blue-500 text-white px-1 rounded">R1</span>
+                  {status.status === 'no-key' && (
+                    <span className="text-xs text-red-500">⚠</span>
+                  )}
+                  {status.status === 'invalid-key' && (
+                    <span className="text-xs text-red-500">❌</span>
+                  )}
+                  {status.status === 'available' && isEnabled && (
+                    <span className="text-xs text-green-500">✓</span>
+                  )}
                 </div>
                 {selectedModel === model && (
                   <Check
@@ -252,17 +304,29 @@ const PureChatModelDropdown = () => {
           <DropdownMenuLabel>⚡ Standard Models</DropdownMenuLabel>
           {STANDARD_MODELS.map((model) => {
             const isEnabled = isModelEnabled(model);
+            const status = getModelStatus(model);
             return (
               <DropdownMenuItem
                 key={model}
-                onSelect={() => isEnabled && setModel(model)}
-                disabled={!isEnabled}
+                onSelect={() => handleModelSelect(model)}
                 className={cn(
                   'flex items-center justify-between gap-2',
                   'cursor-pointer'
                 )}
+                title={status.message}
               >
-                <span>{model}</span>
+                <div className="flex items-center gap-2">
+                  <span className={!isEnabled ? 'text-muted-foreground' : ''}>{model}</span>
+                  {status.status === 'no-key' && (
+                    <span className="text-xs text-red-500">⚠</span>
+                  )}
+                  {status.status === 'invalid-key' && (
+                    <span className="text-xs text-red-500">❌</span>
+                  )}
+                  {status.status === 'available' && isEnabled && (
+                    <span className="text-xs text-green-500">✓</span>
+                  )}
+                </div>
                 {selectedModel === model && (
                   <Check
                     className="w-4 h-4 text-blue-500"
