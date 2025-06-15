@@ -23,6 +23,8 @@ const formSchema = z.object({
   }),
   openrouter: z.string().trim().optional(),
   openai: z.string().trim().optional(),
+  anthropic: z.string().trim().optional(),
+  xai: z.string().trim().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -104,6 +106,26 @@ const Form = () => {
         error={errors.openai}
       />
 
+      <ApiKeyField
+        id="anthropic"
+        label="Anthropic API Key"
+        models={['Claude 4 Opus', 'Claude 4 Sonnet', 'Claude 3.7 Sonnet', 'Claude 3.5 Sonnet', 'Claude 3.5 Haiku']}
+        linkUrl="https://console.anthropic.com/settings/keys"
+        placeholder="sk-ant-..."
+        register={register}
+        error={errors.anthropic}
+      />
+
+      <ApiKeyField
+        id="xai"
+        label="xAI API Key"
+        models={['Grok 3', 'Grok 3 Mini', 'Grok 3 Fast']}
+        linkUrl="https://dashboard.x.ai"
+        placeholder="xai-..."
+        register={register}
+        error={errors.xai}
+      />
+
       <Button type="submit" className="w-full" disabled={!isDirty}>
         Save API Keys
       </Button>
@@ -140,7 +162,7 @@ const ApiKeyField = ({
       <span>{label}</span>
       {required && <span className="text-muted-foreground"> (Required)</span>}
     </label>
-    <div className="flex gap-2">
+    <div className="flex gap-2 flex-wrap">
       {models.map((model) => (
         <Badge key={model}>{model}</Badge>
       ))}

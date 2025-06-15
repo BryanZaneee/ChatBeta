@@ -1,5 +1,7 @@
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createOpenAI } from '@ai-sdk/openai';
+import { createAnthropic } from '@ai-sdk/anthropic';
+import { createXai } from '@ai-sdk/xai';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { streamText, smoothStream } from 'ai';
 import { headers } from 'next/headers';
@@ -32,6 +34,21 @@ export async function POST(req: NextRequest) {
       case 'openrouter':
         const openrouter = createOpenRouter({ apiKey });
         aiModel = openrouter(modelConfig.modelId);
+        break;
+
+      case 'anthropic':
+        const anthropic = createAnthropic({ 
+          apiKey,
+          headers: {
+            'anthropic-dangerous-direct-browser-access': 'true'
+          }
+        });
+        aiModel = anthropic(modelConfig.modelId);
+        break;
+
+      case 'xai':
+        const xai = createXai({ apiKey });
+        aiModel = xai(modelConfig.modelId);
         break;
 
       default:

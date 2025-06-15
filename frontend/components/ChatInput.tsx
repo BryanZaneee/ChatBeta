@@ -8,6 +8,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
 } from '@/frontend/components/ui/dropdown-menu';
 import useAutoResizeTextarea from '@/hooks/useAutoResizeTextArea';
 import { UseChatHelpers, useCompletion } from '@ai-sdk/react';
@@ -16,7 +18,7 @@ import { useNavigate } from 'react-router';
 import { createMessage, createThread } from '@/frontend/dexie/queries';
 import { useAPIKeyStore } from '@/frontend/stores/APIKeyStore';
 import { useModelStore } from '@/frontend/stores/ModelStore';
-import { AI_MODELS, AIModel, getModelConfig } from '@/lib/models';
+import { REASONING_MODELS, STANDARD_MODELS, AIModel, getModelConfig, isReasoningModel } from '@/lib/models';
 import KeyPrompt from '@/frontend/components/KeyPrompt';
 import { UIMessage } from 'ai';
 import { v4 as uuidv4 } from 'uuid';
@@ -208,6 +210,9 @@ const PureChatModelDropdown = () => {
           >
             <div className="flex items-center gap-1">
               {selectedModel}
+              {isReasoningModel(selectedModel) && (
+                <span className="text-xs bg-blue-500 text-white px-1 rounded">R1</span>
+              )}
               <ChevronDown className="w-3 h-3 opacity-50" />
             </div>
           </Button>
@@ -215,7 +220,37 @@ const PureChatModelDropdown = () => {
         <DropdownMenuContent
           className={cn('min-w-[10rem]', 'border-border', 'bg-popover')}
         >
-          {AI_MODELS.map((model) => {
+          <DropdownMenuLabel>🧠 Reasoning Models</DropdownMenuLabel>
+          {REASONING_MODELS.map((model) => {
+            const isEnabled = isModelEnabled(model);
+            return (
+              <DropdownMenuItem
+                key={model}
+                onSelect={() => isEnabled && setModel(model)}
+                disabled={!isEnabled}
+                className={cn(
+                  'flex items-center justify-between gap-2',
+                  'cursor-pointer'
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <span>{model}</span>
+                  <span className="text-xs bg-blue-500 text-white px-1 rounded">R1</span>
+                </div>
+                {selectedModel === model && (
+                  <Check
+                    className="w-4 h-4 text-blue-500"
+                    aria-label="Selected"
+                  />
+                )}
+              </DropdownMenuItem>
+            );
+          })}
+          
+          <DropdownMenuSeparator />
+          
+          <DropdownMenuLabel>⚡ Standard Models</DropdownMenuLabel>
+          {STANDARD_MODELS.map((model) => {
             const isEnabled = isModelEnabled(model);
             return (
               <DropdownMenuItem
