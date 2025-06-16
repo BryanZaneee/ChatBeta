@@ -3,7 +3,7 @@ import { createOpenAI } from '@ai-sdk/openai';
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { createXai } from '@ai-sdk/xai';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
-import { streamText, smoothStream } from 'ai';
+import { streamText } from 'ai';
 import { headers } from 'next/headers';
 import { getModelConfig, AIModel, isReasoningModel } from '@/lib/models';
 import { NextRequest, NextResponse } from 'next/server';
@@ -160,11 +160,16 @@ export async function POST(req: NextRequest) {
         );
     }
 
-    // Configure reasoning parameters for o3 models
+    // Configure reasoning parameters for o3 models and other reasoning models
     let additionalParams = {};
-    if (model.includes('o3-mini')) {
+    if (model.includes('o3') || model.includes('o4-mini')) {
       additionalParams = {
         reasoning_effort: 'medium', // Can be 'low', 'medium', or 'high'
+      };
+    } else if (model.includes('Grok 3 Mini')) {
+      // Grok 3 Mini supports reasoning parameters
+      additionalParams = {
+        reasoning: { effort: 'medium' }, // Grok uses different format
       };
     }
 
@@ -221,8 +226,11 @@ ${isReasoningModel(model as AIModel) ?
           }
           
           if (errorMessage.includes('model') && errorMessage.includes('not found')) {
-            if (currentModel.includes('o3-mini')) {
-              return 'OpenAI o3-mini access not available. This model requires Tier 3+ account and is being rolled out gradually. Try GPT-4o instead.';
+            if (currentModel.includes('o3') || currentModel.includes('o4-mini')) {
+              return 'OpenAI reasoning models (o3, o4-mini) require Tier 3+ account and may have limited availability. Try GPT-4.1 or GPT-4o instead.';
+            }
+            if (currentModel.includes('GPT-4.1')) {
+              return 'GPT-4.1 models may not be available in your region or account tier. Try GPT-4o instead.';
             }
             return `Model "${currentModel}" not found or not available for ${currentProvider}.`;
           }
@@ -239,7 +247,7 @@ ${isReasoningModel(model as AIModel) ?
         return 'An unexpected error occurred. Please try again.';
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error in chat API:', error);
     
     // Enhanced error handling based on API error types
@@ -271,9 +279,15 @@ ${isReasoningModel(model as AIModel) ?
         }
         
         if (errorMessage.includes('model') || errorMessage.includes('not found') || errorMessage.includes('404') || errorCode.includes('NotFoundError')) {
-          if (currentModel.includes('o3-mini')) {
+          if (currentModel.includes('o3') || currentModel.includes('o4-mini')) {
             return NextResponse.json(
-              { error: 'OpenAI o3-mini access not available. This model requires Tier 3+ account and is being rolled out gradually. Try GPT-4o or contact OpenAI support for access.' },
+              { error: 'OpenAI reasoning models (o3, o4-mini) require Tier 3+ account and may have limited availability. Try GPT-4.1 or GPT-4o instead.' },
+              { status: 404 }
+            );
+          }
+          if (currentModel.includes('GPT-4.1')) {
+            return NextResponse.json(
+              { error: 'GPT-4.1 models may not be available in your region or account tier. Try GPT-4o instead.' },
               { status: 404 }
             );
           }

@@ -150,8 +150,10 @@ export default function Chat({ threadId, initialMessages }: ChatProps) {
       } else if (errorMessage.includes('quota') || errorMessage.includes('billing')) {
         toast.error(`API quota exceeded. Please check your ${modelConfig.provider} billing details.`);
       } else if (errorMessage.includes('model') && errorMessage.includes('not found')) {
-        if (selectedModel.includes('o3-mini')) {
-          toast.error('OpenAI o3-mini requires a Tier 3+ account and is being rolled out gradually. Try GPT-4o instead.');
+        if (selectedModel.includes('o3') || selectedModel.includes('o4-mini')) {
+          toast.error('OpenAI reasoning models (o3, o4-mini) require a Tier 3+ account and may have limited availability. Try GPT-4.1 or GPT-4o instead.');
+        } else if (selectedModel.includes('GPT-4.1')) {
+          toast.error('GPT-4.1 models may not be available in your region or account tier. Try GPT-4o instead.');
         } else {
           toast.error(`Model "${selectedModel}" not found or not available. Check your account access.`);
         }
