@@ -5,7 +5,7 @@ import { AIModel, getModelConfig, ModelConfig } from '@/lib/models';
 type ModelStore = {
   selectedModel: AIModel;
   setModel: (model: AIModel) => void;
-  getModelConfig: () => ModelConfig;
+  getModelConfig: () => ModelConfig | null;
 };
 
 type StoreWithPersist = Mutate<
@@ -38,6 +38,10 @@ export const useModelStore = create<ModelStore>()(
 
       getModelConfig: () => {
         const { selectedModel } = get();
+        if (!selectedModel) {
+          // Return null if selectedModel is not yet initialized
+          return null;
+        }
         return getModelConfig(selectedModel);
       },
     }),

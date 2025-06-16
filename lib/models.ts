@@ -145,7 +145,13 @@ export const MODEL_CONFIGS = {
 } as const satisfies Record<AIModel, ModelConfig>;
 
 export function getModelConfig(model: AIModel): ModelConfig {
-  return MODEL_CONFIGS[model];
+  const config = MODEL_CONFIGS[model];
+  if (!config) {
+    // Fallback to a default model if the requested model is not found
+    console.warn(`Model "${model}" not found in MODEL_CONFIGS, falling back to default`);
+    return MODEL_CONFIGS['Gemini 2.5 Flash']; // Default fallback model
+  }
+  return config;
 }
 
 export const isReasoningModel = (modelName: AIModel): boolean => {

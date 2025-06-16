@@ -39,6 +39,10 @@ export default function Chat({ threadId, initialMessages }: ChatProps) {
 
   // Check API key validity when model changes and show toast notification if invalid
   useEffect(() => {
+    if (!modelConfig || !modelConfig.provider) {
+      return; // Don't run if modelConfig is not ready
+    }
+
     const rawKey = getKey(modelConfig.provider);
     
     if (!rawKey) {
@@ -49,10 +53,14 @@ export default function Chat({ threadId, initialMessages }: ChatProps) {
     if (!validation.isValid) {
       toast.error(`Invalid ${modelConfig.provider} API key: ${validation.error}`);
     }
-  }, [modelConfig.provider, selectedModel, getKey, validateApiKey]);
+  }, [modelConfig?.provider, selectedModel, getKey, validateApiKey]);
 
   // Format API key properly for different providers
   const getFormattedApiKey = () => {
+    if (!modelConfig || !modelConfig.provider) {
+      return '';
+    }
+
     const rawKey = getKey(modelConfig.provider);
     if (!rawKey) return '';
     
@@ -144,11 +152,11 @@ export default function Chat({ threadId, initialMessages }: ChatProps) {
       }
       
       if (errorMessage.includes('api key') || errorMessage.includes('authentication')) {
-        toast.error(`Authentication failed. Please check your ${modelConfig.provider} API key in settings.`);
+        toast.error(`Authentication failed. Please check your ${modelConfig?.provider || 'API'} key in settings.`);
       } else if (errorMessage.includes('rate limit') || errorMessage.includes('429')) {
         toast.error('Rate limit exceeded. Please wait a moment before trying again.');
       } else if (errorMessage.includes('quota') || errorMessage.includes('billing')) {
-        toast.error(`API quota exceeded. Please check your ${modelConfig.provider} billing details.`);
+        toast.error(`API quota exceeded. Please check your ${modelConfig?.provider || 'API'} billing details.`);
       } else if (errorMessage.includes('model') && errorMessage.includes('not found')) {
         if (selectedModel.includes('o3') || selectedModel.includes('o4-mini')) {
           toast.error('OpenAI reasoning models (o3, o4-mini) require a Tier 3+ account and may have limited availability. Try GPT-4.1 or GPT-4o instead.');
@@ -166,9 +174,9 @@ export default function Chat({ threadId, initialMessages }: ChatProps) {
         toast.error('An error occurred while processing your request. Please try again.');
       }
     },
-    headers: {
+    headers: modelConfig ? {
       [modelConfig.headerKey]: getFormattedApiKey(),
-    },
+    } : {},
     body: {
       model: selectedModel,
     },

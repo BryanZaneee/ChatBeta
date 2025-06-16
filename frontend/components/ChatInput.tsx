@@ -1,16 +1,8 @@
-import { ChevronDown, Check, ArrowUpIcon } from 'lucide-react';
+import { ArrowUpIcon } from 'lucide-react';
 import { memo, useCallback, useMemo } from 'react';
 import { Textarea } from '@/frontend/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { Button } from '@/frontend/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from '@/frontend/components/ui/dropdown-menu';
 import useAutoResizeTextarea from '@/hooks/useAutoResizeTextArea';
 import { UseChatHelpers, useCompletion } from '@ai-sdk/react';
 import { useParams } from 'react-router';
@@ -18,13 +10,14 @@ import { useNavigate } from 'react-router';
 import { createMessage, createThread } from '@/frontend/dexie/queries';
 import { useAPIKeyStore } from '@/frontend/stores/APIKeyStore';
 import { useModelStore } from '@/frontend/stores/ModelStore';
-import { REASONING_MODELS, STANDARD_MODELS, AIModel, getModelConfig, isReasoningModel } from '@/lib/models';
+import { getModelConfig } from '@/lib/models';
 import KeyPrompt from '@/frontend/components/KeyPrompt';
 import { UIMessage } from 'ai';
 import { v4 as uuidv4 } from 'uuid';
 import { StopIcon } from './ui/icons';
 import { toast } from 'sonner';
 import { useMessageSummary } from '../hooks/useMessageSummary';
+import ModelSelectorDropdown from './ModelSelectorDropdown';
 
 interface ChatInputProps {
   threadId: string;
@@ -164,7 +157,7 @@ function PureChatInput({
 
             <div className="h-14 flex items-center px-2">
               <div className="flex items-center justify-between w-full">
-                <ChatModelDropdown />
+                <ChatModelSelector />
 
                 {status === 'submitted' || status === 'streaming' ? (
                   <StopButton stop={stop} />
@@ -186,163 +179,9 @@ const ChatInput = memo(PureChatInput, (prevProps, nextProps) => {
   return true;
 });
 
-const PureChatModelDropdown = () => {
-  const getKey = useAPIKeyStore((state) => state.getKey);
-  const isKeyValid = useAPIKeyStore((state) => state.isKeyValid);
-  const validateApiKey = useAPIKeyStore((state) => state.validateApiKey);
-  const { selectedModel, setModel } = useModelStore();
-
-  const isModelEnabled = useCallback(
-    (model: AIModel) => {
-      const modelConfig = getModelConfig(model);
-      const apiKey = getKey(modelConfig.provider);
-      const keyValid = isKeyValid(modelConfig.provider);
-      return !!apiKey && keyValid;
-    },
-    [getKey, isKeyValid]
-  );
-
-  const getModelStatus = useCallback(
-    (model: AIModel) => {
-      const modelConfig = getModelConfig(model);
-      const apiKey = getKey(modelConfig.provider);
-      const keyValid = isKeyValid(modelConfig.provider);
-      
-      if (!apiKey) {
-        return { status: 'no-key', message: `No ${modelConfig.provider} API key` };
-      }
-      if (!keyValid) {
-        return { status: 'invalid-key', message: `Invalid ${modelConfig.provider} API key` };
-      }
-      return { status: 'available', message: 'Available' };
-    },
-    [getKey, isKeyValid]
-  );
-
-  const handleModelSelect = useCallback(
-    (model: AIModel) => {
-      const modelConfig = getModelConfig(model);
-      const apiKey = getKey(modelConfig.provider);
-      
-      if (!apiKey) {
-        toast.error(`Please add your ${modelConfig.provider} API key in settings to use ${model}`);
-        return;
-      }
-      
-      const validation = validateApiKey(modelConfig.provider, apiKey);
-      if (!validation.isValid) {
-        toast.error(`Invalid ${modelConfig.provider} API key: ${validation.error}`);
-        return;
-      }
-      
-      setModel(model);
-      toast.success(`Switched to ${model}`);
-    },
-    [getKey, validateApiKey, setModel]
-  );
-
-  return (
-    <div className="flex items-center gap-2">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex items-center gap-1 h-8 pl-2 pr-2 text-xs rounded-md text-foreground hover:bg-primary/10 focus-visible:ring-1 focus-visible:ring-offset-0 focus-visible:ring-blue-500"
-            aria-label={`Selected model: ${selectedModel}`}
-          >
-            <div className="flex items-center gap-1">
-              {selectedModel}
-              {isReasoningModel(selectedModel) && (
-                <span className="text-xs bg-blue-500 text-white px-1 rounded">R1</span>
-              )}
-              <ChevronDown className="w-3 h-3 opacity-50" />
-            </div>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          className={cn('min-w-[10rem]', 'border-border', 'bg-popover')}
-        >
-          <DropdownMenuLabel>🧠 Reasoning Models</DropdownMenuLabel>
-          {REASONING_MODELS.map((model) => {
-            const isEnabled = isModelEnabled(model);
-            const status = getModelStatus(model);
-            return (
-              <DropdownMenuItem
-                key={model}
-                onSelect={() => handleModelSelect(model)}
-                className={cn(
-                  'flex items-center justify-between gap-2',
-                  'cursor-pointer'
-                )}
-                title={status.message}
-              >
-                <div className="flex items-center gap-2">
-                  <span className={!isEnabled ? 'text-muted-foreground' : ''}>{model}</span>
-                  <span className="text-xs bg-blue-500 text-white px-1 rounded">R1</span>
-                  {status.status === 'no-key' && (
-                    <span className="text-xs text-red-500">⚠</span>
-                  )}
-                  {status.status === 'invalid-key' && (
-                    <span className="text-xs text-red-500">❌</span>
-                  )}
-                  {status.status === 'available' && isEnabled && (
-                    <span className="text-xs text-green-500">✓</span>
-                  )}
-                </div>
-                {selectedModel === model && (
-                  <Check
-                    className="w-4 h-4 text-blue-500"
-                    aria-label="Selected"
-                  />
-                )}
-              </DropdownMenuItem>
-            );
-          })}
-          
-          <DropdownMenuSeparator />
-          
-          <DropdownMenuLabel>⚡ Standard Models</DropdownMenuLabel>
-          {STANDARD_MODELS.map((model) => {
-            const isEnabled = isModelEnabled(model);
-            const status = getModelStatus(model);
-            return (
-              <DropdownMenuItem
-                key={model}
-                onSelect={() => handleModelSelect(model)}
-                className={cn(
-                  'flex items-center justify-between gap-2',
-                  'cursor-pointer'
-                )}
-                title={status.message}
-              >
-                <div className="flex items-center gap-2">
-                  <span className={!isEnabled ? 'text-muted-foreground' : ''}>{model}</span>
-                  {status.status === 'no-key' && (
-                    <span className="text-xs text-red-500">⚠</span>
-                  )}
-                  {status.status === 'invalid-key' && (
-                    <span className="text-xs text-red-500">❌</span>
-                  )}
-                  {status.status === 'available' && isEnabled && (
-                    <span className="text-xs text-green-500">✓</span>
-                  )}
-                </div>
-                {selectedModel === model && (
-                  <Check
-                    className="w-4 h-4 text-blue-500"
-                    aria-label="Selected"
-                  />
-                )}
-              </DropdownMenuItem>
-            );
-          })}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
-  );
-};
-
-const ChatModelDropdown = memo(PureChatModelDropdown);
+const ChatModelSelector = memo(() => {
+  return <ModelSelectorDropdown />;
+});
 
 function PureStopButton({ stop }: StopButtonProps) {
   return (
