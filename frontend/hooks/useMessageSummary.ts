@@ -1,5 +1,4 @@
 import { useCompletion } from '@ai-sdk/react';
-import { useAPIKeyStore } from '@/frontend/stores/APIKeyStore';
 import { toast } from 'sonner';
 import { createMessageSummary, updateThread } from '@/frontend/dexie/queries';
 
@@ -11,13 +10,8 @@ interface MessageSummaryPayload {
 }
 
 export const useMessageSummary = () => {
-  const getKey = useAPIKeyStore((state) => state.getKey);
-
   const { complete, isLoading } = useCompletion({
     api: '/api/completion',
-    ...(getKey('google') && {
-      headers: { 'X-Google-API-Key': getKey('google')! },
-    }),
     onResponse: async (response) => {
       try {
         const payload: MessageSummaryPayload = await response.json();

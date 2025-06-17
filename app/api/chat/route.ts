@@ -10,75 +10,23 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const maxDuration = 60;
 
-// API key validation functions
-const validateApiKey = (provider: string, key: string): { isValid: boolean; error?: string } => {
-  const trimmedKey = key.trim();
-  
-  if (!trimmedKey) {
-    return { isValid: false, error: 'API key cannot be empty' };
-  }
-
+// Helper function to get API key from environment variables
+const getApiKeyFromEnv = (provider: string): string | undefined => {
   switch (provider) {
-    case 'openai':
-      if (!trimmedKey.startsWith('sk-') && !trimmedKey.startsWith('sk-proj-')) {
-        return { 
-          isValid: false, 
-          error: 'OpenAI API key must start with "sk-" or "sk-proj-"' 
-        };
-      }
-      if (trimmedKey.length < 40) {
-        return { 
-          isValid: false, 
-          error: 'OpenAI API key appears to be too short' 
-        };
-      }
-      break;
-    case 'anthropic':
-      if (!trimmedKey.startsWith('sk-ant-')) {
-        return { 
-          isValid: false, 
-          error: 'Anthropic API key must start with "sk-ant-"' 
-        };
-      }
-      break;
     case 'google':
-      if (!trimmedKey.startsWith('AIza')) {
-        return { 
-          isValid: false, 
-          error: 'Google API key must start with "AIza"' 
-        };
-      }
-      break;
-    case 'openrouter':
-      // OpenRouter supports both their own keys (sk-or-) and DeepSeek keys (sk-)
-      if (!trimmedKey.startsWith('sk-or-') && !trimmedKey.startsWith('sk-')) {
-        return { 
-          isValid: false, 
-          error: 'OpenRouter API key must start with "sk-or-" or DeepSeek key with "sk-"' 
-        };
-      }
-      // Additional validation for DeepSeek keys
-      if (trimmedKey.startsWith('sk-') && !trimmedKey.startsWith('sk-or-')) {
-        // DeepSeek format: sk-e74b0b93209247b6bceac5a93bfe4d78
-        if (!/^sk-[a-f0-9]{32}$/.test(trimmedKey)) {
-          return {
-            isValid: false,
-            error: 'DeepSeek API key should be in format: sk-[32 hex characters]'
-          };
-        }
-      }
-      break;
+      return process.env.GOOGLE_API_KEY;
+    case 'openai':
+      return process.env.OPENAI_API_KEY;
+    case 'anthropic':
+      return process.env.ANTHROPIC_API_KEY;
     case 'xai':
-      if (!trimmedKey.startsWith('xai-')) {
-        return { 
-          isValid: false, 
-          error: 'xAI API key must start with "xai-"' 
-        };
-      }
-      break;
+      return process.env.XAI_API_KEY;
+    case 'openrouter':
+      // OpenRouter can use its own key or a key from another provider like DeepSeek
+      return process.env.OPENROUTER_API_KEY || process.env.DEEPSEEK_API_KEY;
+    default:
+      return undefined;
   }
-
-  return { isValid: true };
 };
 
 export async function POST(req: NextRequest) {
@@ -93,26 +41,12 @@ export async function POST(req: NextRequest) {
     const modelConfig = getModelConfig(model as AIModel);
     currentProvider = modelConfig.provider;
 
-    const rawApiKey = headersList.get(modelConfig.headerKey);
-    if (!rawApiKey) {
-      return NextResponse.json(
-        { error: `Missing API key for ${modelConfig.provider}. Please add your ${modelConfig.provider} API key in settings.` },
-        { status: 401 }
-      );
-    }
+    const apiKey = getApiKeyFromEnv(currentProvider);
 
-    // Extract the actual API key from Authorization header if needed
-    let apiKey = rawApiKey;
-    if (modelConfig.headerKey === 'Authorization' && rawApiKey.startsWith('Bearer ')) {
-      apiKey = rawApiKey.replace('Bearer ', '');
-    }
-
-    // Validate API key format
-    const validation = validateApiKey(modelConfig.provider, apiKey);
-    if (!validation.isValid) {
+    if (!apiKey) {
       return NextResponse.json(
-        { error: `Invalid ${modelConfig.provider} API key: ${validation.error}` },
-        { status: 401 }
+        { error: `API key for ${currentProvider} is not configured on the server. Please contact the administrator.` },
+        { status: 500 }
       );
     }
 
@@ -247,105 +181,21 @@ ${isReasoningModel(model as AIModel) ?
         return 'An unexpected error occurred. Please try again.';
       },
     });
-  } catch (error: unknown) {
+  } catch (error) {
     console.error('Error in chat API:', error);
-    
-    // Enhanced error handling based on API error types
+
+    let errorMessage = 'An unexpected error occurred. Please try again.';
+    let status = 500;
+
     if (error instanceof Error) {
-      const errorMessage = error.message.toLowerCase();
-      const errorCode = error.name || '';
-      
-      // OpenAI specific errors
-      if (currentProvider === 'openai') {
-        if (errorMessage.includes('rate limit') || errorMessage.includes('429') || errorCode.includes('RateLimitError')) {
-          return NextResponse.json(
-            { error: 'OpenAI rate limit exceeded. Please wait a moment and try again.' },
-            { status: 429 }
-          );
-        }
-        
-        if (errorMessage.includes('authentication') || errorMessage.includes('401') || errorMessage.includes('unauthorized') || errorCode.includes('AuthenticationError')) {
-          return NextResponse.json(
-            { error: 'Invalid OpenAI API key. Please check your API key in settings. Make sure it starts with "sk-" and is valid.' },
-            { status: 401 }
-          );
-        }
-        
-        if (errorMessage.includes('quota') || errorMessage.includes('billing') || errorMessage.includes('insufficient') || errorCode.includes('InsufficientQuotaError')) {
-          return NextResponse.json(
-            { error: 'OpenAI API quota exceeded. Please check your billing details at https://platform.openai.com/account/billing' },
-            { status: 403 }
-          );
-        }
-        
-        if (errorMessage.includes('model') || errorMessage.includes('not found') || errorMessage.includes('404') || errorCode.includes('NotFoundError')) {
-          if (currentModel.includes('o3') || currentModel.includes('o4-mini')) {
-            return NextResponse.json(
-              { error: 'OpenAI reasoning models (o3, o4-mini) require Tier 3+ account and may have limited availability. Try GPT-4.1 or GPT-4o instead.' },
-              { status: 404 }
-            );
-          }
-          if (currentModel.includes('GPT-4.1')) {
-            return NextResponse.json(
-              { error: 'GPT-4.1 models may not be available in your region or account tier. Try GPT-4o instead.' },
-              { status: 404 }
-            );
-          }
-          return NextResponse.json(
-            { error: `OpenAI model "${currentModel}" not found or not available. Check your account tier and model access at https://platform.openai.com/account/limits` },
-            { status: 404 }
-          );
-        }
-
-        if (errorMessage.includes('content') || errorMessage.includes('policy') || errorCode.includes('ContentFilterError')) {
-          return NextResponse.json(
-            { error: 'Content blocked by OpenAI content policy. Please modify your message and try again.' },
-            { status: 400 }
-          );
-        }
-      }
-      
-      // Generic error handling for other providers
-      if (errorMessage.includes('rate limit') || errorMessage.includes('429')) {
-        return NextResponse.json(
-          { error: `${currentProvider} rate limit exceeded. Please try again later.` },
-          { status: 429 }
-        );
-      }
-      
-      if (errorMessage.includes('authentication') || errorMessage.includes('401') || errorMessage.includes('unauthorized')) {
-        return NextResponse.json(
-          { error: `Invalid ${currentProvider} API key. Please check your API key configuration.` },
-          { status: 401 }
-        );
-      }
-      
-      if (errorMessage.includes('quota') || errorMessage.includes('billing') || errorMessage.includes('insufficient')) {
-        return NextResponse.json(
-          { error: `${currentProvider} API quota exceeded. Please check your billing details.` },
-          { status: 403 }
-        );
-      }
-      
-      if (errorMessage.includes('model') || errorMessage.includes('not found') || errorMessage.includes('404')) {
-        return NextResponse.json(
-          { error: `Model "${currentModel}" not found or not available for ${currentProvider}.` },
-          { status: 404 }
-        );
-      }
-
-      if (errorMessage.includes('network') || errorMessage.includes('fetch') || errorMessage.includes('timeout')) {
-        return NextResponse.json(
-          { error: 'Network error occurred. Please check your connection and try again.' },
-          { status: 503 }
-        );
+      errorMessage = error.message;
+      if (error.cause) {
+        // Try to get a more specific status code if available
+        const cause = error.cause as { status?: number };
+        status = cause.status || 500;
       }
     }
-    
-    // Generic fallback error
-    return NextResponse.json(
-      { error: 'An unexpected error occurred. Please try again.' },
-      { status: 500 }
-    );
+
+    return NextResponse.json({ error: errorMessage }, { status });
   }
 }

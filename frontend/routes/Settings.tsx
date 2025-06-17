@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import APIKeyForm from '@/frontend/components/APIKeyForm';
 import { Link } from 'react-router';
 import { buttonVariants } from '../components/ui/button';
 import { ArrowLeftIcon, MessageCircle, Crown, RotateCcw, Plus } from 'lucide-react';
@@ -131,7 +130,6 @@ export default function Settings() {
       </Link>
       <div className="flex items-center justify-center w-full h-full pt-24 pb-44 mx-auto">
         <div className="space-y-8 max-w-2xl">
-          <APIKeyForm />
           
           {/* Debug: Tier Toggle */}
           <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">

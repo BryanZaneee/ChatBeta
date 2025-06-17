@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String?
+  name      String?
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Subscription info
+  subscriptionTier String @default("free") // 'free' | 'paid'
+
+  // Message usage
+  messageUsage MessageUsage[]
+
+  @@map("users")
+}
+
+model MessageUsage {
+  id              String   @id @default(cuid())
+  userId          String
+  regularMessages Int      @default(0)
+  premiumMessages Int      @default(0)
+  resetDate       DateTime // When the monthly limit resets
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("message_usage")
+}
+
+// For anonymous users (IP-based tracking)
+model AnonymousUsage {
+  id           String   @id @default(cuid())
+  ipAddress    String   @unique
+  messageCount Int      @default(0)
+  resetDate    DateTime // When the monthly limit resets (10 messages/month)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("anonymous_usage")
+}

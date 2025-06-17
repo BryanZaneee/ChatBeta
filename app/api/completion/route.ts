@@ -1,18 +1,16 @@
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { generateText } from 'ai';
-import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
-  const headersList = await headers();
-  const googleApiKey = headersList.get('X-Google-API-Key');
+  const googleApiKey = process.env.GOOGLE_API_KEY;
 
   if (!googleApiKey) {
     return NextResponse.json(
       {
-        error: 'Google API key is required to enable chat title generation.',
+        error: 'Google API key is not configured on the server. Please contact the administrator.',
       },
-      { status: 400 }
+      { status: 500 }
     );
   }
 

@@ -8,11 +8,9 @@ import { UseChatHelpers, useCompletion } from '@ai-sdk/react';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router';
 import { createMessage, createThread } from '@/frontend/dexie/queries';
-import { useAPIKeyStore } from '@/frontend/stores/APIKeyStore';
 import { useModelStore } from '@/frontend/stores/ModelStore';
 import { useSubscriptionStore } from '@/frontend/stores/SubscriptionStore';
 import { getModelConfig, isReasoningModel } from '@/lib/models';
-import KeyPrompt from '@/frontend/components/KeyPrompt';
 import { UIMessage } from 'ai';
 import { v4 as uuidv4 } from 'uuid';
 import { StopIcon } from './ui/icons';
@@ -54,7 +52,6 @@ function PureChatInput({
   append,
   stop,
 }: ChatInputProps) {
-  const canChat = useAPIKeyStore((state) => state.hasRequiredKeys());
   const selectedModel = useModelStore((state) => state.selectedModel);
   const { 
     messageCounts, 
@@ -141,10 +138,6 @@ function PureChatInput({
     canSendMessage,
     selectedModel,
   ]);
-
-  if (!canChat) {
-    return <KeyPrompt />;
-  }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {

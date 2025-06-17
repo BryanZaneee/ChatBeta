@@ -5,7 +5,6 @@ import ChatNavigator from './ChatNavigator';
 import { UIMessage } from 'ai';
 import { v4 as uuidv4 } from 'uuid';
 import { createMessage } from '@/frontend/dexie/queries';
-import { useAPIKeyStore } from '@/frontend/stores/APIKeyStore';
 import { useModelStore } from '@/frontend/stores/ModelStore';
 import { useSubscriptionStore } from '@/frontend/stores/SubscriptionStore';
 import { isReasoningModel } from '@/lib/models';
@@ -23,9 +22,7 @@ interface ChatProps {
 }
 
 export default function Chat({ threadId, initialMessages }: ChatProps) {
-  const { getKey, validateApiKey } = useAPIKeyStore();
   const selectedModel = useModelStore((state) => state.selectedModel);
-  const modelConfig = useModelStore((state) => state.getModelConfig());
   const { incrementRegularMessages, incrementPremiumMessages } = useSubscriptionStore();
   const [requestStartTime, setRequestStartTime] = useState<number | null>(null);
   const isCurrentlyReasoning = isReasoningModel(selectedModel);
@@ -38,49 +35,6 @@ export default function Chat({ threadId, initialMessages }: ChatProps) {
     registerRef,
     scrollToMessage,
   } = useChatNavigator();
-
-  // Check API key validity when model changes and show toast notification if invalid
-  useEffect(() => {
-    if (!modelConfig || !modelConfig.provider) {
-      return; // Don't run if modelConfig is not ready
-    }
-
-    const rawKey = getKey(modelConfig.provider);
-    
-    if (!rawKey) {
-      return; // Don't show error if no key is set, let them add one
-    }
-
-    const validation = validateApiKey(modelConfig.provider, rawKey);
-    if (!validation.isValid) {
-      toast.error(`Invalid ${modelConfig.provider} API key: ${validation.error}`);
-    }
-  }, [modelConfig?.provider, selectedModel, getKey, validateApiKey]);
-
-  // Format API key properly for different providers
-  const getFormattedApiKey = () => {
-    if (!modelConfig || !modelConfig.provider) {
-      return '';
-    }
-
-    const rawKey = getKey(modelConfig.provider);
-    if (!rawKey) return '';
-    
-    // Validate key before formatting
-    const validation = validateApiKey(modelConfig.provider, rawKey);
-    if (!validation.isValid) {
-      console.error(`Invalid API key for ${modelConfig.provider}:`, validation.error);
-      return '';
-    }
-    
-    // OpenAI and xAI require Bearer token format
-    if (modelConfig.headerKey === 'Authorization') {
-      return `Bearer ${rawKey}`;
-    }
-    
-    // Other providers use raw key
-    return rawKey;
-  };
 
   const {
     messages,
@@ -161,11 +115,11 @@ export default function Chat({ threadId, initialMessages }: ChatProps) {
       }
       
       if (errorMessage.includes('api key') || errorMessage.includes('authentication')) {
-        toast.error(`Authentication failed. Please check your ${modelConfig?.provider || 'API'} key in settings.`);
+        toast.error(`Authentication failed. Please check your API key in settings.`);
       } else if (errorMessage.includes('rate limit') || errorMessage.includes('429')) {
         toast.error('Rate limit exceeded. Please wait a moment before trying again.');
       } else if (errorMessage.includes('quota') || errorMessage.includes('billing')) {
-        toast.error(`API quota exceeded. Please check your ${modelConfig?.provider || 'API'} billing details.`);
+        toast.error(`API quota exceeded. Please check your API billing details.`);
       } else if (errorMessage.includes('model') && errorMessage.includes('not found')) {
         if (selectedModel.includes('o3') || selectedModel.includes('o4-mini')) {
           toast.error('OpenAI reasoning models (o3, o4-mini) require a Tier 3+ account and may have limited availability. Try GPT-4.1 or GPT-4o instead.');
@@ -183,9 +137,6 @@ export default function Chat({ threadId, initialMessages }: ChatProps) {
         toast.error('An error occurred while processing your request. Please try again.');
       }
     },
-    headers: modelConfig ? {
-      [modelConfig.headerKey]: getFormattedApiKey(),
-    } : {},
     body: {
       model: selectedModel,
     },

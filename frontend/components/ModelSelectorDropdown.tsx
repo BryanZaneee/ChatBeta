@@ -2,7 +2,6 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { Search, Filter, X, Sparkles, FileText, Brain, Image, Zap, Globe, ChevronDown, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useModelStore } from '@/frontend/stores/ModelStore';
-import { useAPIKeyStore } from '@/frontend/stores/APIKeyStore';
 import { useSubscriptionStore } from '@/frontend/stores/SubscriptionStore';
 import { AIModel, REASONING_MODELS, STANDARD_MODELS, getModelConfig, isReasoningModel } from '@/lib/models';
 import { toast } from 'sonner';
@@ -91,57 +90,15 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
   const [filterOpen, setFilterOpen] = useState(false);
   
   const { selectedModel, setModel } = useModelStore();
-  const { getKey, isKeyValid, validateApiKey } = useAPIKeyStore();
-  const { tier, isFreeTier, isPaidTier } = useSubscriptionStore();
-
-  const isModelEnabled = useCallback(
-    (model: AIModel) => {
-      const modelConfig = getModelConfig(model);
-      const apiKey = getKey(modelConfig.provider);
-      const keyValid = isKeyValid(modelConfig.provider);
-      return !!apiKey && keyValid;
-    },
-    [getKey, isKeyValid]
-  );
-
-  const getModelStatus = useCallback(
-    (model: AIModel) => {
-      const modelConfig = getModelConfig(model);
-      const apiKey = getKey(modelConfig.provider);
-      const keyValid = isKeyValid(modelConfig.provider);
-      
-      if (!apiKey) {
-        return { status: 'no-key', message: `No ${modelConfig.provider} API key` };
-      }
-      if (!keyValid) {
-        return { status: 'invalid-key', message: `Invalid ${modelConfig.provider} API key` };
-      }
-      return { status: 'available', message: 'Available' };
-    },
-    [getKey, isKeyValid]
-  );
+  const { tier, isFreeTier } = useSubscriptionStore();
 
   const handleModelSelect = useCallback(
     (model: AIModel) => {
-      const modelConfig = getModelConfig(model);
-      const apiKey = getKey(modelConfig.provider);
-      
-      if (!apiKey) {
-        toast.error(`Please add your ${modelConfig.provider} API key in settings to use ${model}`);
-        return;
-      }
-      
-      const validation = validateApiKey(modelConfig.provider, apiKey);
-      if (!validation.isValid) {
-        toast.error(`Invalid ${modelConfig.provider} API key: ${validation.error}`);
-        return;
-      }
-      
       setModel(model);
       toast.success(`Switched to ${model}`);
       setOpen(false);
     },
-    [getKey, validateApiKey, setModel]
+    [setModel]
   );
 
   const filteredModels = useMemo(() => {
@@ -274,8 +231,6 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
         )}>
           <div className="space-y-1 pb-2">
             {filteredModels.map((model) => {
-              const isEnabled = isModelEnabled(model);
-              const status = getModelStatus(model);
               const capabilities = getModelCapabilities(model);
               const isSelected = selectedModel === model;
               
@@ -288,13 +243,12 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
                     isSelected 
                       ? "border-blue-500 bg-blue-500/10" 
                       : "border-border hover:border-border/80 hover:bg-accent/50",
-                    !isEnabled && "opacity-60"
                   )}
                 >
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <div className="flex flex-col items-start flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className={cn("text-sm font-medium truncate", !isEnabled && "text-muted-foreground")}>
+                        <span className={cn("text-sm font-medium truncate")}>
                           {model}
                         </span>
                         {capabilities.includes('vision') && (
@@ -329,15 +283,7 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
                   </div>
                   
                   <div className="flex items-center gap-2 shrink-0">
-                    {status.status === 'no-key' && (
-                      <span className="text-xs text-red-500">⚠</span>
-                    )}
-                    {status.status === 'invalid-key' && (
-                      <span className="text-xs text-red-500">❌</span>
-                    )}
-                    {status.status === 'available' && isEnabled && (
-                      <span className="text-xs text-green-500">✓</span>
-                    )}
+                    <span className="text-xs text-green-500">✓</span>
                     {isSelected && (
                       <div className="w-2 h-2 rounded-full bg-blue-500" />
                     )}

@@ -1,4 +1,5 @@
-import { Provider } from '@/frontend/stores/APIKeyStore';
+// Provider type for different AI model providers
+export type Provider = 'google' | 'openrouter' | 'openai' | 'anthropic' | 'xai';
 
 // Reasoning models that can perform complex multi-step thinking
 export const REASONING_MODELS = [
