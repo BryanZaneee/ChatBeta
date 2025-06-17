@@ -165,7 +165,7 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
     
     // Show all toggle
     if (!showAll) {
-      filtered = filtered.slice(0, 8);
+      filtered = filtered.slice(0, 6);
     }
     
     return filtered;
@@ -195,7 +195,7 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
         {defaultTrigger}
       </DropdownMenuTrigger>
       <DropdownMenuContent 
-        className="w-[450px] max-w-[90vw] max-h-[500px] p-0 overflow-hidden"
+        className="w-[450px] max-w-[90vw] max-h-[650px] p-0 overflow-hidden"
         align="start"
         side="top"
         sideOffset={8}
@@ -248,7 +248,10 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
         </div>
 
         {/* Models List */}
-        <div className="max-h-[300px] overflow-y-auto px-4">
+        <div className={cn(
+          "px-4",
+          showAll && "max-h-[400px] overflow-y-auto"
+        )}>
           <div className="space-y-1 pb-2">
             {filteredModels.map((model) => {
               const isEnabled = isModelEnabled(model);
@@ -326,8 +329,8 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
         </div>
 
         {/* Footer */}
-        <div className="border-t border-border px-4 py-2">
-          <div className="flex items-center justify-between">
+        <div className="border-t border-border px-4 py-3">
+          <div className="flex items-center justify-between min-h-[40px]">
             <Button
               variant="ghost"
               size="sm"
@@ -359,10 +362,10 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent 
-                align="end" 
-                side="top" 
-                sideOffset={10}
-                className="w-48"
+                align="start" 
+                side="right" 
+                sideOffset={25}
+                className="w-48 -translate-y-13"
               >
                 <div className="p-2">
                   <div className="text-xs font-medium text-muted-foreground mb-2">
