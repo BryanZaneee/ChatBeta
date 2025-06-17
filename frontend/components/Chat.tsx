@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { createMessage } from '@/frontend/dexie/queries';
 import { useAPIKeyStore } from '@/frontend/stores/APIKeyStore';
 import { useModelStore } from '@/frontend/stores/ModelStore';
+import { useSubscriptionStore } from '@/frontend/stores/SubscriptionStore';
 import { isReasoningModel } from '@/lib/models';
 import ThemeToggler from './ui/ThemeToggler';
 import { SidebarTrigger, useSidebar } from './ui/sidebar';
@@ -25,6 +26,7 @@ export default function Chat({ threadId, initialMessages }: ChatProps) {
   const { getKey, validateApiKey } = useAPIKeyStore();
   const selectedModel = useModelStore((state) => state.selectedModel);
   const modelConfig = useModelStore((state) => state.getModelConfig());
+  const { incrementRegularMessages, incrementPremiumMessages } = useSubscriptionStore();
   const [requestStartTime, setRequestStartTime] = useState<number | null>(null);
   const isCurrentlyReasoning = isReasoningModel(selectedModel);
   const errorCountRef = useRef(0);
@@ -108,6 +110,13 @@ export default function Chat({ threadId, initialMessages }: ChatProps) {
         });
       }
       setRequestStartTime(null);
+
+      // Track message usage - increment based on model type
+      if (isCurrentlyReasoning) {
+        incrementPremiumMessages();
+      } else {
+        incrementRegularMessages();
+      }
 
       const aiMessage: UIMessage = {
         id: uuidv4(),

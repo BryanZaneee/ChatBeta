@@ -163,9 +163,29 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
       return true;
     });
     
-    // Show all toggle
+    // Show all toggle - when not showing all, prioritize specific default models
     if (!showAll) {
-      filtered = filtered.slice(0, 6);
+      const defaultModels: AIModel[] = [
+        'Gemini 2.5 Flash',
+        'Gemini 2.5 Pro', 
+        'OpenAI o3',
+        'OpenAI o4-mini',
+        'Claude 4 Sonnet',
+        'Deepseek R1 0528'
+      ];
+      
+      // Get default models that exist in filtered results
+      const prioritizedModels = defaultModels.filter(model => 
+        filtered.includes(model as AIModel)
+      );
+      
+      // Get remaining models not in defaults
+      const remainingModels = filtered.filter(model => 
+        !defaultModels.includes(model)
+      );
+      
+      // Combine prioritized models first, then remaining models, limit to 6 total
+      filtered = [...prioritizedModels, ...remainingModels].slice(0, 6);
     }
     
     return filtered;

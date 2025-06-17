@@ -16,6 +16,7 @@ import { Link, useNavigate, useParams } from 'react-router';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { memo } from 'react';
+import MessageUsageDisplay from './MessageUsageDisplay';
 
 export default function ChatSidebar() {
   const { id } = useParams();
@@ -98,6 +99,7 @@ const Header = memo(PureHeader);
 const PureFooter = () => {
   return (
     <SidebarFooter>
+      <MessageUsageDisplay />
       <Link to="/settings" className={buttonVariants({ variant: 'outline' })}>
         Settings
       </Link>

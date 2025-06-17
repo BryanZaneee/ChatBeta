@@ -10,7 +10,8 @@ import { useNavigate } from 'react-router';
 import { createMessage, createThread } from '@/frontend/dexie/queries';
 import { useAPIKeyStore } from '@/frontend/stores/APIKeyStore';
 import { useModelStore } from '@/frontend/stores/ModelStore';
-import { getModelConfig } from '@/lib/models';
+import { useSubscriptionStore } from '@/frontend/stores/SubscriptionStore';
+import { getModelConfig, isReasoningModel } from '@/lib/models';
 import KeyPrompt from '@/frontend/components/KeyPrompt';
 import { UIMessage } from 'ai';
 import { v4 as uuidv4 } from 'uuid';
@@ -54,6 +55,13 @@ function PureChatInput({
   stop,
 }: ChatInputProps) {
   const canChat = useAPIKeyStore((state) => state.hasRequiredKeys());
+  const selectedModel = useModelStore((state) => state.selectedModel);
+  const { 
+    messageCounts, 
+    getRegularMessageLimit, 
+    getPremiumMessageLimit,
+    checkAndResetIfNeeded 
+  } = useSubscriptionStore();
 
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
     minHeight: 72,
@@ -63,9 +71,22 @@ function PureChatInput({
   const navigate = useNavigate();
   const { id } = useParams();
 
+  const canSendMessage = useMemo(() => {
+    checkAndResetIfNeeded();
+    const isReasoning = isReasoningModel(selectedModel);
+    const regularLimit = getRegularMessageLimit();
+    const premiumLimit = getPremiumMessageLimit();
+    
+    if (isReasoning) {
+      return messageCounts.premiumMessages < premiumLimit;
+    } else {
+      return messageCounts.regularMessages < regularLimit;
+    }
+  }, [selectedModel, messageCounts, getRegularMessageLimit, getPremiumMessageLimit, checkAndResetIfNeeded]);
+
   const isDisabled = useMemo(
-    () => !input.trim() || status === 'streaming' || status === 'submitted',
-    [input, status]
+    () => !input.trim() || status === 'streaming' || status === 'submitted' || !canSendMessage,
+    [input, status, canSendMessage]
   );
 
   const { complete } = useMessageSummary();
@@ -77,8 +98,17 @@ function PureChatInput({
       !currentInput.trim() ||
       status === 'streaming' ||
       status === 'submitted'
-    )
+    ) return;
+
+    if (!canSendMessage) {
+      const isReasoning = isReasoningModel(selectedModel);
+      if (isReasoning) {
+        toast.error('Premium message limit reached. Upgrade or wait for monthly reset.');
+      } else {
+        toast.error('Message limit reached. Upgrade for higher limits or wait for monthly reset.');
+      }
       return;
+    }
 
     const messageId = uuidv4();
 
@@ -108,6 +138,8 @@ function PureChatInput({
     textareaRef,
     threadId,
     complete,
+    canSendMessage,
+    selectedModel,
   ]);
 
   if (!canChat) {
