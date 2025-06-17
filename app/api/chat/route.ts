@@ -7,6 +7,10 @@ import { streamText } from 'ai';
 import { headers } from 'next/headers';
 import { getModelConfig, AIModel, isReasoningModel } from '@/lib/models';
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db'; // Import Prisma client
+
+// Clerk authentication
+import { auth } from '@clerk/nextjs/server';
 
 export const maxDuration = 60;
 
@@ -34,9 +38,67 @@ export async function POST(req: NextRequest) {
   let currentProvider = '';
   
   try {
+    // --- AUTHENTICATION & RATE LIMITING ---
+    const { userId } = await auth(); // Get user ID from Clerk
+    const headersList = await headers(); // Get headers
+
+    if (!userId) {
+      // Handle anonymous users (IP-based rate limiting)
+      const ip = headersList.get('x-forwarded-for') ?? '127.0.0.1';
+      const usage = await prisma.anonymousUsage.findUnique({ where: { ipAddress: ip } });
+
+      const now = new Date();
+      if (usage && usage.resetDate > now && usage.messageCount >= 10) {
+        return NextResponse.json({ error: 'Weekly limit of 10 messages reached for anonymous users. Sign in to get 100 messages per month.' }, { status: 429 });
+      }
+
+      // Update or create usage record for anonymous user (weekly reset)
+      if (usage && usage.resetDate <= now) {
+        // Reset counter (weekly)
+        const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+        await prisma.anonymousUsage.update({
+          where: { ipAddress: ip },
+          data: { messageCount: 1, resetDate: nextWeek },
+        });
+      } else {
+        const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+        await prisma.anonymousUsage.upsert({
+          where: { ipAddress: ip },
+          update: { messageCount: { increment: 1 } },
+          create: { ipAddress: ip, messageCount: 1, resetDate: nextWeek },
+        });
+      }
+
+    } else {
+      // Handle authenticated users
+      const user = await prisma.user.findUnique({
+        where: { clerkId: userId },
+        include: { messageUsage: true },
+      });
+
+      if (!user) {
+        // This should not happen if webhooks are set up correctly
+        return NextResponse.json({ error: 'User not found.' }, { status: 404 });
+      }
+      
+      const usage = user.messageUsage[0]; // Assuming one usage record per user
+      const isPaid = user.subscriptionTier === 'paid';
+      const now = new Date();
+
+      if (usage && usage.resetDate > now) {
+        const limit = isPaid ? 1500 : 100; // Updated limits to match SubscriptionStore
+        const currentMessages = isPaid ? usage.premiumMessages : usage.regularMessages;
+        if (currentMessages >= limit) {
+          return NextResponse.json({ error: 'You have reached your monthly message limit.' }, { status: 429 });
+        }
+      }
+
+      // Defer incrementing the count until after the AI call succeeds
+    }
+    // --- END OF AUTH & RATE LIMITING ---
+
     const { messages, model } = await req.json();
     currentModel = model; // Store for error handling
-    const headersList = await headers();
 
     const modelConfig = getModelConfig(model as AIModel);
     currentProvider = modelConfig.provider;
@@ -69,9 +131,6 @@ export async function POST(req: NextRequest) {
       case 'anthropic':
         const anthropic = createAnthropic({
           apiKey: apiKey,
-          headers: {
-            'anthropic-dangerous-direct-browser-access': 'true',
-          },
         });
         aiModel = anthropic(modelConfig.modelId);
         break;
@@ -122,7 +181,7 @@ ${isReasoningModel(model as AIModel) ?
   'Provide clear and concise responses while being thorough when needed.'
 }`;
 
-    const result = streamText({
+    const result = await streamText({
       model: aiModel,
       messages: [
         {
@@ -135,6 +194,28 @@ ${isReasoningModel(model as AIModel) ?
         // Log the error server-side for debugging
         console.error('AI SDK streamText error:', error);
         // Note: onError should not return anything, just handle logging
+      },
+      onFinish: async () => {
+        // This callback runs after the stream successfully finishes.
+        // Now, we can safely increment the message count.
+        if (userId) {
+          const user = await prisma.user.findUnique({
+            where: { clerkId: userId },
+            select: { id: true, subscriptionTier: true }
+          });
+
+          if (user) {
+            const isPaid = user.subscriptionTier === 'paid';
+            const usageField = isPaid ? 'premiumMessages' : 'regularMessages';
+            
+            await prisma.messageUsage.updateMany({
+              where: { userId: user.id },
+              data: { [usageField]: { increment: 1 } },
+            });
+          }
+        }
+        // Note: We already incremented anonymous usage at the start of the request
+        // to prevent race conditions where a user sends many requests before the first one finishes.
       },
       ...additionalParams,
     });

@@ -17,6 +17,13 @@ import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { memo } from 'react';
 import MessageUsageDisplay from './MessageUsageDisplay';
+import {
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
 
 export default function ChatSidebar() {
   const { id } = useParams();
@@ -98,8 +105,38 @@ const Header = memo(PureHeader);
 
 const PureFooter = () => {
   return (
-    <SidebarFooter>
+    <SidebarFooter className="space-y-2">
       <MessageUsageDisplay />
+      
+      {/* Clerk Authentication Section */}
+      <SignedOut>
+        <div className="flex flex-col gap-2">
+          <SignInButton mode="modal">
+            <Button variant="outline" className="w-full">
+              Sign In
+            </Button>
+          </SignInButton>
+          <SignUpButton mode="modal">
+            <Button variant="default" className="w-full">
+              Sign Up
+            </Button>
+          </SignUpButton>
+        </div>
+      </SignedOut>
+      
+      <SignedIn>
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">Signed in</span>
+          <UserButton 
+            appearance={{
+              elements: {
+                avatarBox: "h-8 w-8"
+              }
+            }}
+          />
+        </div>
+      </SignedIn>
+      
       <Link to="/settings" className={buttonVariants({ variant: 'outline' })}>
         Settings
       </Link>

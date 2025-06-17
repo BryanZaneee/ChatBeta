@@ -6,6 +6,7 @@ import { useSubscriptionStore } from '@/frontend/stores/SubscriptionStore';
 export default function MessageUsageDisplay() {
   const { 
     messageCounts, 
+    isAuthenticated,
     getRegularMessageLimit, 
     getPremiumMessageLimit,
     checkAndResetIfNeeded 
@@ -23,6 +24,9 @@ export default function MessageUsageDisplay() {
 
   const regularProgress = (regularUsed / regularLimit) * 100;
   const premiumProgress = premiumLimit > 0 ? (premiumUsed / premiumLimit) * 100 : 0;
+
+  // Determine the reset period text
+  const periodText = isAuthenticated ? 'per month' : 'per week';
 
   return (
     <div className="px-2 py-3 space-y-3">
@@ -50,40 +54,54 @@ export default function MessageUsageDisplay() {
             style={{ width: `${Math.min(regularProgress, 100)}%` }}
           />
         </div>
+        <p className="text-xs text-muted-foreground">
+          {isAuthenticated ? `Resets monthly` : `${regularLimit} messages per week`}
+        </p>
       </div>
 
       {/* Premium Messages */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Crown className="h-4 w-4 text-amber-500" />
-            <span className="text-sm font-medium">Premium</span>
+      {isAuthenticated && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Crown className="h-4 w-4 text-amber-500" />
+              <span className="text-sm font-medium">Premium</span>
+            </div>
+            <span className="text-sm text-muted-foreground">
+              {premiumUsed}/{premiumLimit}
+            </span>
           </div>
-          <span className="text-sm text-muted-foreground">
-            {premiumUsed}/{premiumLimit}
-          </span>
+          <div className="w-full bg-secondary rounded-full h-2">
+            <div
+              className={cn(
+                "h-2 rounded-full transition-all duration-300",
+                premiumLimit === 0
+                  ? "bg-gray-300"
+                  : premiumProgress >= 95 
+                    ? "bg-red-500" 
+                    : premiumProgress >= 80 
+                      ? "bg-yellow-500" 
+                      : "bg-amber-500"
+              )}
+              style={{ width: `${Math.min(premiumProgress, 100)}%` }}
+            />
+          </div>
+          {premiumLimit === 0 && (
+            <p className="text-xs text-muted-foreground">
+              Upgrade to access premium messages
+            </p>
+          )}
         </div>
-        <div className="w-full bg-secondary rounded-full h-2">
-          <div
-            className={cn(
-              "h-2 rounded-full transition-all duration-300",
-              premiumLimit === 0
-                ? "bg-gray-300"
-                : premiumProgress >= 95 
-                  ? "bg-red-500" 
-                  : premiumProgress >= 80 
-                    ? "bg-yellow-500" 
-                    : "bg-amber-500"
-            )}
-            style={{ width: `${Math.min(premiumProgress, 100)}%` }}
-          />
-        </div>
-        {premiumLimit === 0 && (
-          <p className="text-xs text-muted-foreground">
-            Upgrade to access premium messages
+      )}
+
+      {/* Sign-in prompt for unauthenticated users */}
+      {!isAuthenticated && (
+        <div className="mt-2 p-2 bg-muted/50 rounded-md">
+          <p className="text-xs text-muted-foreground text-center">
+            Sign in to get 100 messages per month
           </p>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 } 

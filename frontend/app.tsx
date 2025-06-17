@@ -4,10 +4,12 @@ import Home from './routes/Home';
 import Index from './routes/Index';
 import Thread from './routes/Thread';
 import Settings from './routes/Settings';
+import AuthSync from './components/AuthSync';
 
 export default function App() {
   return (
     <BrowserRouter>
+      <AuthSync />
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="chat" element={<ChatLayout />}>

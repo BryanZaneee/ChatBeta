@@ -6,13 +6,15 @@ export type SubscriptionTier = 'free' | 'paid'; // | 'ultra' - Future tier for e
 type MessageCounts = {
   regularMessages: number;
   premiumMessages: number;
-  resetDate: string; // ISO date string for when counts reset (monthly)
+  resetDate: string; // ISO date string for when counts reset
 };
 
 type SubscriptionStore = {
   tier: SubscriptionTier;
   messageCounts: MessageCounts;
+  isAuthenticated: boolean;
   setTier: (tier: SubscriptionTier) => void;
+  setIsAuthenticated: (isAuthenticated: boolean) => void;
   isFreeTier: () => boolean;
   isPaidTier: () => boolean;
   // Message limit methods
@@ -25,20 +27,46 @@ type SubscriptionStore = {
   // isUltraTier: () => boolean; - Future method for ultra tier
 };
 
-const getInitialMessageCounts = (): MessageCounts => ({
-  regularMessages: 0,
-  premiumMessages: 0,
-  resetDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString(), // First of next month
-});
+const getInitialMessageCounts = (isAuthenticated: boolean): MessageCounts => {
+  if (isAuthenticated) {
+    // Monthly reset for authenticated users
+    return {
+      regularMessages: 0,
+      premiumMessages: 0,
+      resetDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString(), // First of next month
+    };
+  } else {
+    // Weekly reset for unauthenticated users
+    const now = new Date();
+    const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    return {
+      regularMessages: 0,
+      premiumMessages: 0,
+      resetDate: nextWeek.toISOString(),
+    };
+  }
+};
 
 export const useSubscriptionStore = create<SubscriptionStore>()(
   persist(
     (set, get) => ({
       tier: 'free', // Default to free tier
-      messageCounts: getInitialMessageCounts(),
+      messageCounts: getInitialMessageCounts(false), // Default to unauthenticated
+      isAuthenticated: false,
 
       setTier: (tier) => {
         set({ tier });
+      },
+
+      setIsAuthenticated: (isAuthenticated) => {
+        const currentAuth = get().isAuthenticated;
+        if (currentAuth !== isAuthenticated) {
+          // Reset message counts when authentication state changes
+          set({ 
+            isAuthenticated,
+            messageCounts: getInitialMessageCounts(isAuthenticated)
+          });
+        }
       },
 
       isFreeTier: () => {
@@ -50,12 +78,22 @@ export const useSubscriptionStore = create<SubscriptionStore>()(
       },
 
       getRegularMessageLimit: () => {
-        const { tier } = get();
-        return tier === 'free' ? 100 : 1500;
+        const { tier, isAuthenticated } = get();
+        
+        if (!isAuthenticated) {
+          return 10; // 10 messages per week for unauthenticated users
+        }
+        
+        return tier === 'free' ? 100 : 1500; // Monthly limits for authenticated users
       },
 
       getPremiumMessageLimit: () => {
-        const { tier } = get();
+        const { tier, isAuthenticated } = get();
+        
+        if (!isAuthenticated) {
+          return 0; // No premium messages for unauthenticated users
+        }
+        
         return tier === 'free' ? 0 : 100;
       },
 
@@ -80,8 +118,9 @@ export const useSubscriptionStore = create<SubscriptionStore>()(
       },
 
       resetMessageCounts: () => {
+        const { isAuthenticated } = get();
         set({
-          messageCounts: getInitialMessageCounts(),
+          messageCounts: getInitialMessageCounts(isAuthenticated),
         });
       },
 
@@ -104,6 +143,7 @@ export const useSubscriptionStore = create<SubscriptionStore>()(
       partialize: (state) => ({ 
         tier: state.tier,
         messageCounts: state.messageCounts,
+        isAuthenticated: state.isAuthenticated,
       }),
     }
   )
