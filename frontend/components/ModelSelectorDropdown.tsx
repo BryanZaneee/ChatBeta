@@ -1,8 +1,9 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { Search, Filter, X, Sparkles, FileText, Brain, Image, Zap, Globe, ChevronDown } from 'lucide-react';
+import { Search, Filter, X, Sparkles, FileText, Brain, Image, Zap, Globe, ChevronDown, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useModelStore } from '@/frontend/stores/ModelStore';
 import { useAPIKeyStore } from '@/frontend/stores/APIKeyStore';
+import { useSubscriptionStore } from '@/frontend/stores/SubscriptionStore';
 import { AIModel, REASONING_MODELS, STANDARD_MODELS, getModelConfig, isReasoningModel } from '@/lib/models';
 import { toast } from 'sonner';
 import { Button } from '@/frontend/components/ui/button';
@@ -23,11 +24,12 @@ interface ModelCapability {
 }
 
 const MODEL_CAPABILITIES: ModelCapability[] = [
-  { id: 'search', name: 'Search', icon: Globe, description: 'Web search and real-time information' },
+  { id: 'fast', name: 'Fast', icon: Zap, description: 'Quick response times' },
+  { id: 'imageGen', name: 'Image Generation', icon: Image, description: 'AI image creation' },
   { id: 'pdfs', name: 'PDFs', icon: FileText, description: 'PDF document processing' },
   { id: 'reasoning', name: 'Reasoning', icon: Brain, description: 'Advanced reasoning and problem solving' },
-  { id: 'imageGen', name: 'Image Generation', icon: Image, description: 'AI image creation' },
-  { id: 'fast', name: 'Fast', icon: Zap, description: 'Quick response times' },
+  { id: 'search', name: 'Search', icon: Globe, description: 'Web search and real-time information' },
+  { id: 'vision', name: 'Vision', icon: Eye, description: 'Image understanding and analysis' },
 ];
 
 // Model capability mapping
@@ -44,6 +46,16 @@ const getModelCapabilities = (model: AIModel): string[] => {
     capabilities.push('reasoning');
   }
   
+  // Vision models - based on memory of vision-enabled models
+  const visionModels = [
+    'Claude 4 Opus', 'Claude 4 Sonnet', 'Claude 3.7 Sonnet', 'Claude 3.5 Sonnet',
+    'Gemini 2.5 Pro', 'Gemini 2.5 Flash',
+    'GPT-4.1', 'GPT-4.1 Mini', 'GPT-4.1 Nano', 'GPT-4o', 'GPT-4o-mini'
+  ];
+  if (visionModels.some(visionModel => model.includes(visionModel))) {
+    capabilities.push('vision');
+  }
+  
   // PDF processing (most models support this)
   capabilities.push('pdfs');
   
@@ -55,7 +67,17 @@ const getModelCapabilities = (model: AIModel): string[] => {
   return capabilities;
 };
 
-
+// Function to get available models based on subscription tier
+const getAvailableModels = (tier: 'free' | 'paid'): AIModel[] => {
+  if (tier === 'free') {
+    // Free tier: Only Gemini 2.5 Flash
+    return ['Gemini 2.5 Flash'];
+  }
+  
+  // Paid tier: All models
+  // Ultra tier would include additional premium models in the future
+  return [...REASONING_MODELS, ...STANDARD_MODELS];
+};
 
 interface ModelSelectorDropdownProps {
   trigger?: React.ReactNode;
@@ -70,6 +92,7 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
   
   const { selectedModel, setModel } = useModelStore();
   const { getKey, isKeyValid, validateApiKey } = useAPIKeyStore();
+  const { tier, isFreeTier, isPaidTier } = useSubscriptionStore();
 
   const isModelEnabled = useCallback(
     (model: AIModel) => {
@@ -122,9 +145,10 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
   );
 
   const filteredModels = useMemo(() => {
-    const allModels = [...REASONING_MODELS, ...STANDARD_MODELS];
+    // Get models available for current tier
+    const availableModels = getAvailableModels(tier);
     
-    let filtered = allModels.filter(model => {
+    let filtered = availableModels.filter(model => {
       // Search filter
       if (searchQuery && !model.toLowerCase().includes(searchQuery.toLowerCase())) {
         return false;
@@ -145,7 +169,7 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
     }
     
     return filtered;
-  }, [searchQuery, selectedFilters, showAll]);
+  }, [searchQuery, selectedFilters, showAll, tier]);
 
   const toggleFilter = (filterId: string) => {
     setSelectedFilters(prev => 
@@ -178,7 +202,12 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
       >
         {/* Header with Search */}
         <div className="px-4 pt-4 pb-2">
-          <h3 className="font-semibold text-sm mb-3">Model Selector</h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold text-sm">Model Selector</h3>
+            <Badge variant={isFreeTier() ? "secondary" : "default"} className="text-xs">
+              {tier.toUpperCase()}
+            </Badge>
+          </div>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -189,6 +218,18 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
             />
           </div>
         </div>
+
+        {/* Tier-based messaging */}
+        {isFreeTier() && (
+          <div className="mx-4 mb-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-blue-500" />
+              <p className="text-xs text-blue-700 dark:text-blue-300">
+                Free tier: Gemini 2.5 Flash available. Upgrade for access to all models.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Upgrade Banner */}
         <div className="mx-4 mb-3 bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20 rounded-lg p-3">
@@ -233,6 +274,9 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
                         <span className={cn("text-sm font-medium truncate", !isEnabled && "text-muted-foreground")}>
                           {model}
                         </span>
+                        {capabilities.includes('vision') && (
+                          <Eye className="h-3 w-3 text-blue-500" />
+                        )}
                       </div>
                       <div className="flex items-center gap-1 flex-wrap">
                         {capabilities.slice(0, 4).map((capId) => {
@@ -314,7 +358,12 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" side="right" className="w-48">
+              <DropdownMenuContent 
+                align="end" 
+                side="top" 
+                sideOffset={10}
+                className="w-48"
+              >
                 <div className="p-2">
                   <div className="text-xs font-medium text-muted-foreground mb-2">
                     Filter by capabilities
