@@ -67,14 +67,13 @@ const getModelCapabilities = (model: AIModel): string[] => {
 };
 
 // Function to get available models based on subscription tier
-const getAvailableModels = (tier: 'free' | 'paid'): AIModel[] => {
-  if (tier === 'free') {
+const getAvailableModels = (tier: 'free' | 'paid', showAllOnFree: boolean = false): AIModel[] => {
+  if (tier === 'free' && !showAllOnFree) {
     // Free tier: Only non-premium models (Gemini 2.5 Flash)
     return [...REASONING_MODELS, ...STANDARD_MODELS].filter(model => !isPremiumModel(model));
   }
   
-  // Paid tier: All models
-  // Ultra tier would include additional premium models in the future
+  // Paid tier or free tier with "show all": All models
   return [...REASONING_MODELS, ...STANDARD_MODELS];
 };
 
@@ -109,7 +108,7 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
 
   const filteredModels = useMemo(() => {
     // Get models available for current tier
-    const availableModels = getAvailableModels(tier);
+    const availableModels = getAvailableModels(tier, showAll);
     
     let filtered = availableModels.filter(model => {
       // Search filter
@@ -178,7 +177,7 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
         {defaultTrigger}
       </DropdownMenuTrigger>
       <DropdownMenuContent 
-        className="w-[450px] max-w-[90vw] max-h-[650px] p-0 overflow-hidden"
+        className="w-[450px] max-w-[90vw] max-h-[650px] p-0 overflow-hidden flex flex-col"
         align="start"
         side="top"
         sideOffset={8}
@@ -231,82 +230,80 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
         </div>
 
         {/* Models List */}
-        <div className={cn(
-          "px-4",
-          showAll && "max-h-[400px] overflow-y-auto"
-        )}>
-          <div className="space-y-1 pb-2">
-            {filteredModels.map((model) => {
-              const capabilities = getModelCapabilities(model);
-              const isSelected = selectedModel === model;
-              
-              return (
-                <button
-                  key={model}
-                  onClick={() => handleModelSelect(model)}
-                  className={cn(
-                    "w-full flex items-center justify-between p-2 rounded-md border transition-all text-left",
-                    isSelected 
-                      ? "border-blue-500 bg-blue-500/10" 
-                      : "border-border hover:border-border/80 hover:bg-accent/50",
-                  )}
-                >
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <div className="flex flex-col items-start flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className={cn("text-sm font-medium truncate")}>
-                          {model}
-                        </span>
-                        {isPremiumModel(model) && (
-                          <Badge variant="secondary" className="text-xs h-4 px-1 bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300">
-                            Premium
-                          </Badge>
-                        )}
-                        {capabilities.includes('vision') && (
-                          <Eye className="h-3 w-3 text-blue-500" />
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1 flex-wrap">
-                        {capabilities.slice(0, 4).map((capId) => {
-                          const capability = MODEL_CAPABILITIES.find(c => c.id === capId);
-                          if (!capability) return null;
-                          const Icon = capability.icon;
-                          return (
-                            <div 
-                              key={capId}
-                              className={cn(
-                                "flex items-center gap-1 px-1 py-0.5 rounded text-xs",
-                                selectedFilters.includes(capId) 
-                                  ? "bg-blue-500/20 text-blue-600 dark:text-blue-400"
-                                  : "bg-muted text-muted-foreground"
-                              )}
-                            >
-                              <Icon className="h-2.5 w-2.5" />
-                              <span className="text-xs">{capability.name}</span>
-                            </div>
-                          );
-                        })}
-                        {capabilities.length > 4 && (
-                          <span className="text-xs text-muted-foreground">+{capabilities.length - 4}</span>
-                        )}
+        <div className="flex-1 min-h-0">
+          <div className={cn(
+            "px-4",
+            showAll ? "max-h-[350px] overflow-y-auto" : "max-h-none"
+          )}>
+            <div className="space-y-1 pb-2">
+              {filteredModels.map((model) => {
+                const capabilities = getModelCapabilities(model);
+                const isSelected = selectedModel === model;
+                const isPremium = isPremiumModel(model);
+                const isDisabled = isPremium && isFreeTier();
+                
+                return (
+                  <button
+                    key={model}
+                    onClick={() => !isDisabled && handleModelSelect(model)}
+                    disabled={isDisabled}
+                    className={cn(
+                      "w-full flex items-center justify-between p-2 rounded-md border transition-all text-left",
+                      isSelected 
+                        ? "border-blue-500 bg-blue-500/10" 
+                        : "border-border hover:border-border/80 hover:bg-accent/50",
+                      isDisabled && "opacity-50 cursor-not-allowed hover:bg-transparent hover:border-border"
+                    )}
+                  >
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <div className="flex flex-col items-start flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={cn("text-sm font-medium truncate")}>
+                            {model}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 flex-wrap">
+                          {capabilities.slice(0, 4).map((capId) => {
+                            const capability = MODEL_CAPABILITIES.find(c => c.id === capId);
+                            if (!capability) return null;
+                            const Icon = capability.icon;
+                            return (
+                              <div 
+                                key={capId}
+                                className={cn(
+                                  "flex items-center gap-1 px-1 py-0.5 rounded text-xs",
+                                  selectedFilters.includes(capId) 
+                                    ? "bg-blue-500/20 text-blue-600 dark:text-blue-400"
+                                    : "bg-muted text-muted-foreground"
+                                )}
+                              >
+                                <Icon className="h-2.5 w-2.5" />
+                                <span className="text-xs">{capability.name}</span>
+                              </div>
+                            );
+                          })}
+                          {capabilities.length > 4 && (
+                            <span className="text-xs text-muted-foreground">+{capabilities.length - 4}</span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-xs text-green-500">✓</span>
-                    {isSelected && (
-                      <div className="w-2 h-2 rounded-full bg-blue-500" />
-                    )}
-                  </div>
-                </button>
-              );
-            })}
+                    
+                    <div className="flex items-center gap-2 shrink-0">
+                      {!isDisabled && <span className="text-xs text-green-500">✓</span>}
+                      {isSelected && (
+                        <div className="w-2 h-2 rounded-full bg-blue-500" />
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="border-t border-border px-4 py-3">
+        <div className="border-t border-border px-4 py-3 mt-auto flex-shrink-0">
           <div className="flex items-center justify-between min-h-[40px]">
             <Button
               variant="ghost"
