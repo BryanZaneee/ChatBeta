@@ -60,7 +60,11 @@ export async function POST(req: NextRequest) {
     try {
       const user = evt.data;
       
-      // Create user in database
+      // Create user in database with message tracking built-in
+      const nextMonth = new Date();
+      nextMonth.setMonth(nextMonth.getMonth() + 1);
+      nextMonth.setDate(1);
+      
       await prisma.user.create({
         data: {
           clerkId: user.id,
@@ -68,17 +72,6 @@ export async function POST(req: NextRequest) {
           name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || null,
           imageUrl: user.image_url,
           subscriptionTier: "free",
-        },
-      });
-
-      // Create initial message usage record
-      const nextMonth = new Date();
-      nextMonth.setMonth(nextMonth.getMonth() + 1);
-      nextMonth.setDate(1);
-      
-      await prisma.messageUsage.create({
-        data: {
-          userId: user.id,
           regularMessages: 0,
           premiumMessages: 0,
           resetDate: nextMonth,

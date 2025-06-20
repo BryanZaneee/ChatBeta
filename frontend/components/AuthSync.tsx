@@ -4,11 +4,17 @@ import { useSubscriptionStore } from "../stores/SubscriptionStore";
 
 export default function AuthSync() {
   const { isSignedIn } = useAuth();
-  const { setIsAuthenticated } = useSubscriptionStore();
+  const { setIsAuthenticated, syncWithDatabase } = useSubscriptionStore();
 
   useEffect(() => {
     setIsAuthenticated(!!isSignedIn);
-  }, [isSignedIn, setIsAuthenticated]);
+    
+    // Sync with database when user signs in
+    if (isSignedIn) {
+      console.log('User signed in, syncing with database...');
+      syncWithDatabase();
+    }
+  }, [isSignedIn, setIsAuthenticated, syncWithDatabase]);
 
   return null; // This component only handles sync, no UI
 } 

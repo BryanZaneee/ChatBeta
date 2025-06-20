@@ -3,7 +3,7 @@ import { Search, Filter, X, Sparkles, FileText, Brain, Image, Zap, Globe, Chevro
 import { cn } from '@/lib/utils';
 import { useModelStore } from '@/frontend/stores/ModelStore';
 import { useSubscriptionStore } from '@/frontend/stores/SubscriptionStore';
-import { AIModel, REASONING_MODELS, STANDARD_MODELS, getModelConfig, isReasoningModel } from '@/lib/models';
+import { AIModel, REASONING_MODELS, STANDARD_MODELS, getModelConfig, isReasoningModel, isPremiumModel } from '@/lib/models';
 import { toast } from 'sonner';
 import { Button } from '@/frontend/components/ui/button';
 import { Input } from '@/frontend/components/ui/input';
@@ -69,8 +69,8 @@ const getModelCapabilities = (model: AIModel): string[] => {
 // Function to get available models based on subscription tier
 const getAvailableModels = (tier: 'free' | 'paid'): AIModel[] => {
   if (tier === 'free') {
-    // Free tier: Only Gemini 2.5 Flash
-    return ['Gemini 2.5 Flash'];
+    // Free tier: Only non-premium models (Gemini 2.5 Flash)
+    return [...REASONING_MODELS, ...STANDARD_MODELS].filter(model => !isPremiumModel(model));
   }
   
   // Paid tier: All models
@@ -94,11 +94,17 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
 
   const handleModelSelect = useCallback(
     (model: AIModel) => {
+      // Check if this is a premium model and user is on free tier
+      if (isPremiumModel(model) && isFreeTier()) {
+        toast.error(`${model} is a premium model. Please upgrade to access it.`);
+        return;
+      }
+      
       setModel(model);
       toast.success(`Switched to ${model}`);
       setOpen(false);
     },
-    [setModel]
+    [setModel, isFreeTier]
   );
 
   const filteredModels = useMemo(() => {
@@ -202,7 +208,7 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-blue-500" />
               <p className="text-xs text-blue-700 dark:text-blue-300">
-                Free tier: Gemini 2.5 Flash available. Upgrade for access to all models.
+                Free tier: Only Gemini 2.5 Flash available. Upgrade for access to premium models.
               </p>
             </div>
           </div>
@@ -251,6 +257,11 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
                         <span className={cn("text-sm font-medium truncate")}>
                           {model}
                         </span>
+                        {isPremiumModel(model) && (
+                          <Badge variant="secondary" className="text-xs h-4 px-1 bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300">
+                            Premium
+                          </Badge>
+                        )}
                         {capabilities.includes('vision') && (
                           <Eye className="h-3 w-3 text-blue-500" />
                         )}

@@ -158,3 +158,8 @@ export function getModelConfig(model: AIModel): ModelConfig {
 export const isReasoningModel = (modelName: AIModel): boolean => {
   return REASONING_MODELS.includes(modelName as typeof REASONING_MODELS[number]);
 };
+
+export const isPremiumModel = (modelName: AIModel): boolean => {
+  // All models except Gemini 2.5 Flash are premium models
+  return modelName !== 'Gemini 2.5 Flash';
+};

@@ -15,6 +15,7 @@ type SubscriptionStore = {
   isAuthenticated: boolean;
   setTier: (tier: SubscriptionTier) => void;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
+  syncWithDatabase: () => Promise<void>;
   isFreeTier: () => boolean;
   isPaidTier: () => boolean;
   // Message limit methods
@@ -66,6 +67,44 @@ export const useSubscriptionStore = create<SubscriptionStore>()(
             isAuthenticated,
             messageCounts: getInitialMessageCounts(isAuthenticated)
           });
+        }
+      },
+
+      syncWithDatabase: async () => {
+        const { isAuthenticated } = get();
+        
+        if (!isAuthenticated) {
+          console.log('User not authenticated, skipping database sync');
+          return;
+        }
+
+        try {
+          console.log('Syncing subscription store with database...');
+          const response = await fetch('/api/user-data');
+          
+          if (!response.ok) {
+            console.error('Failed to fetch user data from database:', response.status);
+            return;
+          }
+
+          const data = await response.json();
+          
+          if (data.success && data.user) {
+            console.log('Syncing with database values:', data.user);
+            
+            set({
+              tier: data.user.subscriptionTier,
+              messageCounts: {
+                regularMessages: data.user.messageCounts.regularMessages,
+                premiumMessages: data.user.messageCounts.premiumMessages,
+                resetDate: data.user.messageCounts.resetDate
+              }
+            });
+            
+            console.log('Successfully synced subscription store with database');
+          }
+        } catch (error) {
+          console.error('Error syncing with database:', error);
         }
       },
 

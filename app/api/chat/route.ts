@@ -5,7 +5,7 @@ import { createXai } from '@ai-sdk/xai';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { streamText } from 'ai';
 import { headers } from 'next/headers';
-import { getModelConfig, AIModel, isReasoningModel } from '@/lib/models';
+import { getModelConfig, AIModel, isReasoningModel, isPremiumModel } from '@/lib/models';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db'; // Import Prisma client
 
@@ -41,6 +41,8 @@ export async function POST(req: NextRequest) {
     // --- AUTHENTICATION & RATE LIMITING ---
     const { userId } = await auth(); // Get user ID from Clerk
     const headersList = await headers(); // Get headers
+    
+    console.log('Auth debug - userId from Clerk:', userId);
 
     if (!userId) {
       // Handle anonymous users (IP-based rate limiting)
@@ -71,34 +73,77 @@ export async function POST(req: NextRequest) {
 
     } else {
       // Handle authenticated users
+      console.log('Looking for user with clerkId:', userId);
+      
       const user = await prisma.user.findUnique({
         where: { clerkId: userId },
-        include: { messageUsage: true },
       });
+
+      console.log('Found user:', user);
 
       if (!user) {
         // This should not happen if webhooks are set up correctly
+        console.log('User not found in database for clerkId:', userId);
         return NextResponse.json({ error: 'User not found.' }, { status: 404 });
       }
       
-      const usage = user.messageUsage[0]; // Assuming one usage record per user
       const isPaid = user.subscriptionTier === 'paid';
       const now = new Date();
 
-      if (usage && usage.resetDate > now) {
-        const limit = isPaid ? 1500 : 100; // Updated limits to match SubscriptionStore
-        const currentMessages = isPaid ? usage.premiumMessages : usage.regularMessages;
-        if (currentMessages >= limit) {
-          return NextResponse.json({ error: 'You have reached your monthly message limit.' }, { status: 429 });
+      // Check if user has reached their limit
+      if (user.resetDate > now) {
+        // Check limits based on subscription tier
+        if (isPaid) {
+          // Paid users have both regular and premium limits
+          if (user.regularMessages >= 1500) {
+            return NextResponse.json({ error: 'You have reached your monthly regular message limit (1500).' }, { status: 429 });
+          }
+          if (user.premiumMessages >= 100) {
+            return NextResponse.json({ error: 'You have reached your monthly premium message limit (100).' }, { status: 429 });
+          }
+        } else {
+          // Free users only have regular messages
+          if (user.regularMessages >= 100) {
+            return NextResponse.json({ error: 'You have reached your monthly regular message limit (100).' }, { status: 429 });
+          }
         }
       }
 
       // Defer incrementing the count until after the AI call succeeds
     }
-    // --- END OF AUTH & RATE LIMITING ---
-
+    // Check if the model is premium (for authenticated users only)
     const { messages, model } = await req.json();
     currentModel = model; // Store for error handling
+    
+    // Additional check for authenticated users using premium models
+    if (userId) {
+      const user = await prisma.user.findUnique({
+        where: { clerkId: userId },
+        select: { subscriptionTier: true, regularMessages: true, premiumMessages: true, resetDate: true }
+      });
+
+      if (user) {
+        const isPaid = user.subscriptionTier === 'paid';
+        const isModelPremium = isPremiumModel(model as AIModel);
+        const now = new Date();
+        
+        // Check specific limits for premium models
+        if (isModelPremium && !isPaid) {
+          return NextResponse.json({ 
+            error: 'Premium models require a paid subscription. Please upgrade or use Gemini 2.5 Flash.' 
+          }, { status: 403 });
+        }
+        
+        if (isModelPremium && isPaid && user.resetDate > now) {
+          if (user.premiumMessages >= 100) {
+            return NextResponse.json({ 
+              error: 'You have reached your monthly premium message limit (100). Use Gemini 2.5 Flash for regular messages.' 
+            }, { status: 429 });
+          }
+        }
+      }
+    }
+    // --- END OF AUTH & RATE LIMITING ---
 
     const modelConfig = getModelConfig(model as AIModel);
     currentProvider = modelConfig.provider;
@@ -206,10 +251,22 @@ ${isReasoningModel(model as AIModel) ?
 
           if (user) {
             const isPaid = user.subscriptionTier === 'paid';
-            const usageField = isPaid ? 'premiumMessages' : 'regularMessages';
+            const isModelPremium = isPremiumModel(model as AIModel);
             
-            await prisma.messageUsage.updateMany({
-              where: { userId: user.id },
+            // Determine which counter to increment based on model and subscription
+            let usageField: string;
+            
+            if (isModelPremium && isPaid) {
+              // Premium model on paid subscription = premium counter
+              usageField = 'premiumMessages';
+            } else {
+              // Non-premium model OR free user using any model = regular counter
+              usageField = 'regularMessages';
+            }
+            
+            // Increment message count directly in User table
+            await prisma.user.update({
+              where: { clerkId: userId },
               data: { [usageField]: { increment: 1 } },
             });
           }

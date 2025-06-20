@@ -9,13 +9,19 @@ export default function MessageUsageDisplay() {
     isAuthenticated,
     getRegularMessageLimit, 
     getPremiumMessageLimit,
-    checkAndResetIfNeeded 
+    checkAndResetIfNeeded,
+    syncWithDatabase 
   } = useSubscriptionStore();
 
-  // Check if we need to reset counts on component mount
+  // Check if we need to reset counts on component mount and sync with database
   React.useEffect(() => {
     checkAndResetIfNeeded();
-  }, [checkAndResetIfNeeded]);
+    
+    // Sync with database when component mounts (if authenticated)
+    if (isAuthenticated) {
+      syncWithDatabase();
+    }
+  }, [checkAndResetIfNeeded, syncWithDatabase, isAuthenticated]);
 
   const regularLimit = getRegularMessageLimit();
   const premiumLimit = getPremiumMessageLimit();
@@ -65,7 +71,7 @@ export default function MessageUsageDisplay() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Crown className="h-4 w-4 text-amber-500" />
-              <span className="text-sm font-medium">Premium</span>
+              <span className="text-sm font-medium">Premium Models</span>
             </div>
             <span className="text-sm text-muted-foreground">
               {premiumUsed}/{premiumLimit}
@@ -88,7 +94,7 @@ export default function MessageUsageDisplay() {
           </div>
           {premiumLimit === 0 && (
             <p className="text-xs text-muted-foreground">
-              Upgrade to access premium messages
+              Upgrade to access premium models (all models except Gemini 2.5 Flash)
             </p>
           )}
         </div>

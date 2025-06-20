@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router';
 import { buttonVariants } from '../components/ui/button';
-import { ArrowLeftIcon, MessageCircle, Crown, RotateCcw, Plus } from 'lucide-react';
+import { ArrowLeftIcon, MessageCircle, Crown, RotateCcw, Plus, RefreshCw } from 'lucide-react';
 import { useSubscriptionStore, SubscriptionTier } from '@/frontend/stores/SubscriptionStore';
 import { Button } from '@/frontend/components/ui/button';
 import { Badge } from '@/frontend/components/ui/badge';
@@ -20,15 +20,43 @@ export default function Settings() {
     incrementRegularMessages,
     incrementPremiumMessages,
     resetMessageCounts,
-    checkAndResetIfNeeded
+    checkAndResetIfNeeded,
+    syncWithDatabase
   } = useSubscriptionStore();
 
   const [regularAmount, setRegularAmount] = useState(1);
   const [premiumAmount, setPremiumAmount] = useState(1);
 
-  const handleTierChange = (newTier: SubscriptionTier) => {
-    setTier(newTier);
-    toast.success(`Switched to ${newTier.toUpperCase()} tier`);
+  const handleTierChange = async (newTier: SubscriptionTier) => {
+    try {
+      // Update the local state first
+      setTier(newTier);
+      
+      // Update the database
+      const response = await fetch('/api/update-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tier: newTier }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update subscription tier');
+      }
+      
+      const data = await response.json();
+      console.log('Subscription tier updated in database:', data);
+      
+      toast.success(`Switched to ${newTier.toUpperCase()} tier and updated in database`);
+    } catch (error) {
+      console.error('Error updating subscription tier:', error);
+      toast.error(`Failed to update subscription tier: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      
+      // Revert the local state if database update failed
+      setTier(tier);
+    }
   };
 
   const handleIncrementRegular = () => {
@@ -97,6 +125,13 @@ export default function Settings() {
     toast.success('Message counts reset to 0');
   };
 
+  const handleSyncWithDatabase = async () => {
+    toast.loading('Syncing with database...');
+    await syncWithDatabase();
+    toast.dismiss();
+    toast.success('Successfully synced with database');
+  };
+
   // Quick preset buttons for common test amounts
   const handleQuickAdd = (type: 'regular' | 'premium', amount: number) => {
     if (type === 'regular') {
@@ -106,10 +141,13 @@ export default function Settings() {
     }
   };
 
-  // Check and update counts on component mount
+  // Check and update counts on component mount and sync with database
   React.useEffect(() => {
     checkAndResetIfNeeded();
-  }, [checkAndResetIfNeeded]);
+    
+    // Sync with database to ensure counters are accurate
+    syncWithDatabase();
+  }, [checkAndResetIfNeeded, syncWithDatabase]);
 
   const regularLimit = getRegularMessageLimit();
   const premiumLimit = getPremiumMessageLimit();
@@ -171,7 +209,7 @@ export default function Settings() {
               </Button> */}
             </div>
             <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-2">
-              Free tier: Only Gemini 2.5 Flash available | Paid tier: All models available
+              Free tier: Only Gemini 2.5 Flash available | Paid tier: All models available (premium models count toward premium limit)
             </p>
           </div>
 
@@ -301,17 +339,28 @@ export default function Settings() {
                 </div>
               </div>
 
-              {/* Reset Button */}
+              {/* Reset and Sync Buttons */}
               <div className="pt-2 border-t">
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={handleResetCounts}
-                  className="flex items-center gap-1"
-                >
-                  <RotateCcw className="h-3 w-3" />
-                  Reset All Counts
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={handleResetCounts}
+                    className="flex items-center gap-1"
+                  >
+                    <RotateCcw className="h-3 w-3" />
+                    Reset All Counts
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleSyncWithDatabase}
+                    className="flex items-center gap-1"
+                  >
+                    <RefreshCw className="h-3 w-3" />
+                    Sync with Database
+                  </Button>
+                </div>
               </div>
             </div>
 

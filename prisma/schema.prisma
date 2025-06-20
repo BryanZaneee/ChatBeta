@@ -26,24 +26,12 @@ model User {
   // Subscription info
   subscriptionTier String @default("free") // 'free' | 'paid'
 
-  // Message usage
-  messageUsage MessageUsage[]
-
-  @@map("users")
-}
-
-model MessageUsage {
-  id              String   @id @default(cuid())
-  userId          String
+  // Message usage tracking - directly in User table
   regularMessages Int      @default(0)
   premiumMessages Int      @default(0)
-  resetDate       DateTime // When the monthly limit resets
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  resetDate       DateTime @default(now()) // When the monthly limit resets
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("message_usage")
+  @@map("users")
 }
 
 // For anonymous users (IP-based tracking)

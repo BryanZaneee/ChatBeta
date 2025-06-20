@@ -19,11 +19,6 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
- * Model MessageUsage
- * 
- */
-export type MessageUsage = $Result.DefaultSelection<Prisma.$MessageUsagePayload>
-/**
  * Model AnonymousUsage
  * 
  */
@@ -165,16 +160,6 @@ export class PrismaClient<
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
 
   /**
-   * `prisma.messageUsage`: Exposes CRUD operations for the **MessageUsage** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more MessageUsages
-    * const messageUsages = await prisma.messageUsage.findMany()
-    * ```
-    */
-  get messageUsage(): Prisma.MessageUsageDelegate<ExtArgs, ClientOptions>;
-
-  /**
    * `prisma.anonymousUsage`: Exposes CRUD operations for the **AnonymousUsage** model.
     * Example usage:
     * ```ts
@@ -241,8 +226,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 6.10.0
-   * Query Engine version: aee10d5a411e4360c6d3445ce4810ca65adbf3e8
+   * Prisma Client JS version: 6.10.1
+   * Query Engine version: 9b628578b3b7cae625e8c927178f15a170e74a9c
    */
   export type PrismaVersion = {
     client: string
@@ -624,7 +609,6 @@ export namespace Prisma {
 
   export const ModelName: {
     User: 'User',
-    MessageUsage: 'MessageUsage',
     AnonymousUsage: 'AnonymousUsage'
   };
 
@@ -644,7 +628,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "messageUsage" | "anonymousUsage"
+      modelProps: "user" | "anonymousUsage"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -719,80 +703,6 @@ export namespace Prisma {
           count: {
             args: Prisma.UserCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
-          }
-        }
-      }
-      MessageUsage: {
-        payload: Prisma.$MessageUsagePayload<ExtArgs>
-        fields: Prisma.MessageUsageFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.MessageUsageFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MessageUsagePayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.MessageUsageFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MessageUsagePayload>
-          }
-          findFirst: {
-            args: Prisma.MessageUsageFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MessageUsagePayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.MessageUsageFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MessageUsagePayload>
-          }
-          findMany: {
-            args: Prisma.MessageUsageFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MessageUsagePayload>[]
-          }
-          create: {
-            args: Prisma.MessageUsageCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MessageUsagePayload>
-          }
-          createMany: {
-            args: Prisma.MessageUsageCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.MessageUsageCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MessageUsagePayload>[]
-          }
-          delete: {
-            args: Prisma.MessageUsageDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MessageUsagePayload>
-          }
-          update: {
-            args: Prisma.MessageUsageUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MessageUsagePayload>
-          }
-          deleteMany: {
-            args: Prisma.MessageUsageDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.MessageUsageUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.MessageUsageUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MessageUsagePayload>[]
-          }
-          upsert: {
-            args: Prisma.MessageUsageUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MessageUsagePayload>
-          }
-          aggregate: {
-            args: Prisma.MessageUsageAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateMessageUsage>
-          }
-          groupBy: {
-            args: Prisma.MessageUsageGroupByArgs<ExtArgs>
-            result: $Utils.Optional<MessageUsageGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.MessageUsageCountArgs<ExtArgs>
-            result: $Utils.Optional<MessageUsageCountAggregateOutputType> | number
           }
         }
       }
@@ -955,7 +865,6 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     user?: UserOmit
-    messageUsage?: MessageUsageOmit
     anonymousUsage?: AnonymousUsageOmit
   }
 
@@ -1046,36 +955,6 @@ export namespace Prisma {
    */
 
 
-  /**
-   * Count Type UserCountOutputType
-   */
-
-  export type UserCountOutputType = {
-    messageUsage: number
-  }
-
-  export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    messageUsage?: boolean | UserCountOutputTypeCountMessageUsageArgs
-  }
-
-  // Custom InputTypes
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the UserCountOutputType
-     */
-    select?: UserCountOutputTypeSelect<ExtArgs> | null
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountMessageUsageArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: MessageUsageWhereInput
-  }
-
 
   /**
    * Models
@@ -1087,8 +966,20 @@ export namespace Prisma {
 
   export type AggregateUser = {
     _count: UserCountAggregateOutputType | null
+    _avg: UserAvgAggregateOutputType | null
+    _sum: UserSumAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
+  }
+
+  export type UserAvgAggregateOutputType = {
+    regularMessages: number | null
+    premiumMessages: number | null
+  }
+
+  export type UserSumAggregateOutputType = {
+    regularMessages: number | null
+    premiumMessages: number | null
   }
 
   export type UserMinAggregateOutputType = {
@@ -1100,6 +991,9 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     subscriptionTier: string | null
+    regularMessages: number | null
+    premiumMessages: number | null
+    resetDate: Date | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -1111,6 +1005,9 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     subscriptionTier: string | null
+    regularMessages: number | null
+    premiumMessages: number | null
+    resetDate: Date | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -1122,9 +1019,22 @@ export namespace Prisma {
     createdAt: number
     updatedAt: number
     subscriptionTier: number
+    regularMessages: number
+    premiumMessages: number
+    resetDate: number
     _all: number
   }
 
+
+  export type UserAvgAggregateInputType = {
+    regularMessages?: true
+    premiumMessages?: true
+  }
+
+  export type UserSumAggregateInputType = {
+    regularMessages?: true
+    premiumMessages?: true
+  }
 
   export type UserMinAggregateInputType = {
     id?: true
@@ -1135,6 +1045,9 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     subscriptionTier?: true
+    regularMessages?: true
+    premiumMessages?: true
+    resetDate?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -1146,6 +1059,9 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     subscriptionTier?: true
+    regularMessages?: true
+    premiumMessages?: true
+    resetDate?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -1157,6 +1073,9 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     subscriptionTier?: true
+    regularMessages?: true
+    premiumMessages?: true
+    resetDate?: true
     _all?: true
   }
 
@@ -1198,6 +1117,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: UserAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: UserSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: UserMinAggregateInputType
@@ -1228,6 +1159,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: UserCountAggregateInputType | true
+    _avg?: UserAvgAggregateInputType
+    _sum?: UserSumAggregateInputType
     _min?: UserMinAggregateInputType
     _max?: UserMaxAggregateInputType
   }
@@ -1241,7 +1174,12 @@ export namespace Prisma {
     createdAt: Date
     updatedAt: Date
     subscriptionTier: string
+    regularMessages: number
+    premiumMessages: number
+    resetDate: Date
     _count: UserCountAggregateOutputType | null
+    _avg: UserAvgAggregateOutputType | null
+    _sum: UserSumAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
   }
@@ -1269,8 +1207,9 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     subscriptionTier?: boolean
-    messageUsage?: boolean | User$messageUsageArgs<ExtArgs>
-    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
+    regularMessages?: boolean
+    premiumMessages?: boolean
+    resetDate?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1282,6 +1221,9 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     subscriptionTier?: boolean
+    regularMessages?: boolean
+    premiumMessages?: boolean
+    resetDate?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1293,6 +1235,9 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     subscriptionTier?: boolean
+    regularMessages?: boolean
+    premiumMessages?: boolean
+    resetDate?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -1304,21 +1249,16 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     subscriptionTier?: boolean
+    regularMessages?: boolean
+    premiumMessages?: boolean
+    resetDate?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clerkId" | "email" | "name" | "imageUrl" | "createdAt" | "updatedAt" | "subscriptionTier", ExtArgs["result"]["user"]>
-  export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    messageUsage?: boolean | User$messageUsageArgs<ExtArgs>
-    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
-  }
-  export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
-  export type UserIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clerkId" | "email" | "name" | "imageUrl" | "createdAt" | "updatedAt" | "subscriptionTier" | "regularMessages" | "premiumMessages" | "resetDate", ExtArgs["result"]["user"]>
 
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
-    objects: {
-      messageUsage: Prisma.$MessageUsagePayload<ExtArgs>[]
-    }
+    objects: {}
     scalars: $Extensions.GetPayloadResult<{
       id: string
       clerkId: string
@@ -1328,6 +1268,9 @@ export namespace Prisma {
       createdAt: Date
       updatedAt: Date
       subscriptionTier: string
+      regularMessages: number
+      premiumMessages: number
+      resetDate: Date
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -1722,7 +1665,6 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    messageUsage<T extends User$messageUsageArgs<ExtArgs> = {}>(args?: Subset<T, User$messageUsageArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessageUsagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1760,6 +1702,9 @@ export namespace Prisma {
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
     readonly subscriptionTier: FieldRef<"User", 'String'>
+    readonly regularMessages: FieldRef<"User", 'Int'>
+    readonly premiumMessages: FieldRef<"User", 'Int'>
+    readonly resetDate: FieldRef<"User", 'DateTime'>
   }
     
 
@@ -1776,10 +1721,6 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
     /**
      * Filter, which User to fetch.
      */
@@ -1799,10 +1740,6 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter, which User to fetch.
      */
     where: UserWhereUniqueInput
@@ -1820,10 +1757,6 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
     /**
      * Filter, which User to fetch.
      */
@@ -1873,10 +1806,6 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter, which User to fetch.
      */
     where?: UserWhereInput
@@ -1925,10 +1854,6 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter, which Users to fetch.
      */
     where?: UserWhereInput
@@ -1971,10 +1896,6 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
     /**
      * The data needed to create a User.
      */
@@ -2021,10 +1942,6 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
     /**
      * The data needed to update a User.
      */
@@ -2092,10 +2009,6 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * The filter to search for the User to update in case it exists.
      */
     where: UserWhereUniqueInput
@@ -2122,10 +2035,6 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter which User to delete.
      */
     where: UserWhereUniqueInput
@@ -2146,30 +2055,6 @@ export namespace Prisma {
   }
 
   /**
-   * User.messageUsage
-   */
-  export type User$messageUsageArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MessageUsage
-     */
-    select?: MessageUsageSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MessageUsage
-     */
-    omit?: MessageUsageOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MessageUsageInclude<ExtArgs> | null
-    where?: MessageUsageWhereInput
-    orderBy?: MessageUsageOrderByWithRelationInput | MessageUsageOrderByWithRelationInput[]
-    cursor?: MessageUsageWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: MessageUsageScalarFieldEnum | MessageUsageScalarFieldEnum[]
-  }
-
-  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2181,1130 +2066,6 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-  }
-
-
-  /**
-   * Model MessageUsage
-   */
-
-  export type AggregateMessageUsage = {
-    _count: MessageUsageCountAggregateOutputType | null
-    _avg: MessageUsageAvgAggregateOutputType | null
-    _sum: MessageUsageSumAggregateOutputType | null
-    _min: MessageUsageMinAggregateOutputType | null
-    _max: MessageUsageMaxAggregateOutputType | null
-  }
-
-  export type MessageUsageAvgAggregateOutputType = {
-    regularMessages: number | null
-    premiumMessages: number | null
-  }
-
-  export type MessageUsageSumAggregateOutputType = {
-    regularMessages: number | null
-    premiumMessages: number | null
-  }
-
-  export type MessageUsageMinAggregateOutputType = {
-    id: string | null
-    userId: string | null
-    regularMessages: number | null
-    premiumMessages: number | null
-    resetDate: Date | null
-    createdAt: Date | null
-    updatedAt: Date | null
-  }
-
-  export type MessageUsageMaxAggregateOutputType = {
-    id: string | null
-    userId: string | null
-    regularMessages: number | null
-    premiumMessages: number | null
-    resetDate: Date | null
-    createdAt: Date | null
-    updatedAt: Date | null
-  }
-
-  export type MessageUsageCountAggregateOutputType = {
-    id: number
-    userId: number
-    regularMessages: number
-    premiumMessages: number
-    resetDate: number
-    createdAt: number
-    updatedAt: number
-    _all: number
-  }
-
-
-  export type MessageUsageAvgAggregateInputType = {
-    regularMessages?: true
-    premiumMessages?: true
-  }
-
-  export type MessageUsageSumAggregateInputType = {
-    regularMessages?: true
-    premiumMessages?: true
-  }
-
-  export type MessageUsageMinAggregateInputType = {
-    id?: true
-    userId?: true
-    regularMessages?: true
-    premiumMessages?: true
-    resetDate?: true
-    createdAt?: true
-    updatedAt?: true
-  }
-
-  export type MessageUsageMaxAggregateInputType = {
-    id?: true
-    userId?: true
-    regularMessages?: true
-    premiumMessages?: true
-    resetDate?: true
-    createdAt?: true
-    updatedAt?: true
-  }
-
-  export type MessageUsageCountAggregateInputType = {
-    id?: true
-    userId?: true
-    regularMessages?: true
-    premiumMessages?: true
-    resetDate?: true
-    createdAt?: true
-    updatedAt?: true
-    _all?: true
-  }
-
-  export type MessageUsageAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which MessageUsage to aggregate.
-     */
-    where?: MessageUsageWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of MessageUsages to fetch.
-     */
-    orderBy?: MessageUsageOrderByWithRelationInput | MessageUsageOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: MessageUsageWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` MessageUsages from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` MessageUsages.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned MessageUsages
-    **/
-    _count?: true | MessageUsageCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to average
-    **/
-    _avg?: MessageUsageAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: MessageUsageSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: MessageUsageMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: MessageUsageMaxAggregateInputType
-  }
-
-  export type GetMessageUsageAggregateType<T extends MessageUsageAggregateArgs> = {
-        [P in keyof T & keyof AggregateMessageUsage]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateMessageUsage[P]>
-      : GetScalarType<T[P], AggregateMessageUsage[P]>
-  }
-
-
-
-
-  export type MessageUsageGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: MessageUsageWhereInput
-    orderBy?: MessageUsageOrderByWithAggregationInput | MessageUsageOrderByWithAggregationInput[]
-    by: MessageUsageScalarFieldEnum[] | MessageUsageScalarFieldEnum
-    having?: MessageUsageScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: MessageUsageCountAggregateInputType | true
-    _avg?: MessageUsageAvgAggregateInputType
-    _sum?: MessageUsageSumAggregateInputType
-    _min?: MessageUsageMinAggregateInputType
-    _max?: MessageUsageMaxAggregateInputType
-  }
-
-  export type MessageUsageGroupByOutputType = {
-    id: string
-    userId: string
-    regularMessages: number
-    premiumMessages: number
-    resetDate: Date
-    createdAt: Date
-    updatedAt: Date
-    _count: MessageUsageCountAggregateOutputType | null
-    _avg: MessageUsageAvgAggregateOutputType | null
-    _sum: MessageUsageSumAggregateOutputType | null
-    _min: MessageUsageMinAggregateOutputType | null
-    _max: MessageUsageMaxAggregateOutputType | null
-  }
-
-  type GetMessageUsageGroupByPayload<T extends MessageUsageGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<MessageUsageGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof MessageUsageGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], MessageUsageGroupByOutputType[P]>
-            : GetScalarType<T[P], MessageUsageGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type MessageUsageSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    userId?: boolean
-    regularMessages?: boolean
-    premiumMessages?: boolean
-    resetDate?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["messageUsage"]>
-
-  export type MessageUsageSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    userId?: boolean
-    regularMessages?: boolean
-    premiumMessages?: boolean
-    resetDate?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["messageUsage"]>
-
-  export type MessageUsageSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    userId?: boolean
-    regularMessages?: boolean
-    premiumMessages?: boolean
-    resetDate?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["messageUsage"]>
-
-  export type MessageUsageSelectScalar = {
-    id?: boolean
-    userId?: boolean
-    regularMessages?: boolean
-    premiumMessages?: boolean
-    resetDate?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-  }
-
-  export type MessageUsageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "regularMessages" | "premiumMessages" | "resetDate" | "createdAt" | "updatedAt", ExtArgs["result"]["messageUsage"]>
-  export type MessageUsageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
-  }
-  export type MessageUsageIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
-  }
-  export type MessageUsageIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
-  }
-
-  export type $MessageUsagePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "MessageUsage"
-    objects: {
-      user: Prisma.$UserPayload<ExtArgs>
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      userId: string
-      regularMessages: number
-      premiumMessages: number
-      resetDate: Date
-      createdAt: Date
-      updatedAt: Date
-    }, ExtArgs["result"]["messageUsage"]>
-    composites: {}
-  }
-
-  type MessageUsageGetPayload<S extends boolean | null | undefined | MessageUsageDefaultArgs> = $Result.GetResult<Prisma.$MessageUsagePayload, S>
-
-  type MessageUsageCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<MessageUsageFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: MessageUsageCountAggregateInputType | true
-    }
-
-  export interface MessageUsageDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MessageUsage'], meta: { name: 'MessageUsage' } }
-    /**
-     * Find zero or one MessageUsage that matches the filter.
-     * @param {MessageUsageFindUniqueArgs} args - Arguments to find a MessageUsage
-     * @example
-     * // Get one MessageUsage
-     * const messageUsage = await prisma.messageUsage.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends MessageUsageFindUniqueArgs>(args: SelectSubset<T, MessageUsageFindUniqueArgs<ExtArgs>>): Prisma__MessageUsageClient<$Result.GetResult<Prisma.$MessageUsagePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one MessageUsage that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {MessageUsageFindUniqueOrThrowArgs} args - Arguments to find a MessageUsage
-     * @example
-     * // Get one MessageUsage
-     * const messageUsage = await prisma.messageUsage.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends MessageUsageFindUniqueOrThrowArgs>(args: SelectSubset<T, MessageUsageFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MessageUsageClient<$Result.GetResult<Prisma.$MessageUsagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first MessageUsage that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {MessageUsageFindFirstArgs} args - Arguments to find a MessageUsage
-     * @example
-     * // Get one MessageUsage
-     * const messageUsage = await prisma.messageUsage.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends MessageUsageFindFirstArgs>(args?: SelectSubset<T, MessageUsageFindFirstArgs<ExtArgs>>): Prisma__MessageUsageClient<$Result.GetResult<Prisma.$MessageUsagePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first MessageUsage that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {MessageUsageFindFirstOrThrowArgs} args - Arguments to find a MessageUsage
-     * @example
-     * // Get one MessageUsage
-     * const messageUsage = await prisma.messageUsage.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends MessageUsageFindFirstOrThrowArgs>(args?: SelectSubset<T, MessageUsageFindFirstOrThrowArgs<ExtArgs>>): Prisma__MessageUsageClient<$Result.GetResult<Prisma.$MessageUsagePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more MessageUsages that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {MessageUsageFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all MessageUsages
-     * const messageUsages = await prisma.messageUsage.findMany()
-     * 
-     * // Get first 10 MessageUsages
-     * const messageUsages = await prisma.messageUsage.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const messageUsageWithIdOnly = await prisma.messageUsage.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends MessageUsageFindManyArgs>(args?: SelectSubset<T, MessageUsageFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessageUsagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a MessageUsage.
-     * @param {MessageUsageCreateArgs} args - Arguments to create a MessageUsage.
-     * @example
-     * // Create one MessageUsage
-     * const MessageUsage = await prisma.messageUsage.create({
-     *   data: {
-     *     // ... data to create a MessageUsage
-     *   }
-     * })
-     * 
-     */
-    create<T extends MessageUsageCreateArgs>(args: SelectSubset<T, MessageUsageCreateArgs<ExtArgs>>): Prisma__MessageUsageClient<$Result.GetResult<Prisma.$MessageUsagePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many MessageUsages.
-     * @param {MessageUsageCreateManyArgs} args - Arguments to create many MessageUsages.
-     * @example
-     * // Create many MessageUsages
-     * const messageUsage = await prisma.messageUsage.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends MessageUsageCreateManyArgs>(args?: SelectSubset<T, MessageUsageCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many MessageUsages and returns the data saved in the database.
-     * @param {MessageUsageCreateManyAndReturnArgs} args - Arguments to create many MessageUsages.
-     * @example
-     * // Create many MessageUsages
-     * const messageUsage = await prisma.messageUsage.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many MessageUsages and only return the `id`
-     * const messageUsageWithIdOnly = await prisma.messageUsage.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends MessageUsageCreateManyAndReturnArgs>(args?: SelectSubset<T, MessageUsageCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessageUsagePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a MessageUsage.
-     * @param {MessageUsageDeleteArgs} args - Arguments to delete one MessageUsage.
-     * @example
-     * // Delete one MessageUsage
-     * const MessageUsage = await prisma.messageUsage.delete({
-     *   where: {
-     *     // ... filter to delete one MessageUsage
-     *   }
-     * })
-     * 
-     */
-    delete<T extends MessageUsageDeleteArgs>(args: SelectSubset<T, MessageUsageDeleteArgs<ExtArgs>>): Prisma__MessageUsageClient<$Result.GetResult<Prisma.$MessageUsagePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one MessageUsage.
-     * @param {MessageUsageUpdateArgs} args - Arguments to update one MessageUsage.
-     * @example
-     * // Update one MessageUsage
-     * const messageUsage = await prisma.messageUsage.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends MessageUsageUpdateArgs>(args: SelectSubset<T, MessageUsageUpdateArgs<ExtArgs>>): Prisma__MessageUsageClient<$Result.GetResult<Prisma.$MessageUsagePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more MessageUsages.
-     * @param {MessageUsageDeleteManyArgs} args - Arguments to filter MessageUsages to delete.
-     * @example
-     * // Delete a few MessageUsages
-     * const { count } = await prisma.messageUsage.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends MessageUsageDeleteManyArgs>(args?: SelectSubset<T, MessageUsageDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more MessageUsages.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {MessageUsageUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many MessageUsages
-     * const messageUsage = await prisma.messageUsage.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends MessageUsageUpdateManyArgs>(args: SelectSubset<T, MessageUsageUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more MessageUsages and returns the data updated in the database.
-     * @param {MessageUsageUpdateManyAndReturnArgs} args - Arguments to update many MessageUsages.
-     * @example
-     * // Update many MessageUsages
-     * const messageUsage = await prisma.messageUsage.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more MessageUsages and only return the `id`
-     * const messageUsageWithIdOnly = await prisma.messageUsage.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends MessageUsageUpdateManyAndReturnArgs>(args: SelectSubset<T, MessageUsageUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessageUsagePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one MessageUsage.
-     * @param {MessageUsageUpsertArgs} args - Arguments to update or create a MessageUsage.
-     * @example
-     * // Update or create a MessageUsage
-     * const messageUsage = await prisma.messageUsage.upsert({
-     *   create: {
-     *     // ... data to create a MessageUsage
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the MessageUsage we want to update
-     *   }
-     * })
-     */
-    upsert<T extends MessageUsageUpsertArgs>(args: SelectSubset<T, MessageUsageUpsertArgs<ExtArgs>>): Prisma__MessageUsageClient<$Result.GetResult<Prisma.$MessageUsagePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of MessageUsages.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {MessageUsageCountArgs} args - Arguments to filter MessageUsages to count.
-     * @example
-     * // Count the number of MessageUsages
-     * const count = await prisma.messageUsage.count({
-     *   where: {
-     *     // ... the filter for the MessageUsages we want to count
-     *   }
-     * })
-    **/
-    count<T extends MessageUsageCountArgs>(
-      args?: Subset<T, MessageUsageCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], MessageUsageCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a MessageUsage.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {MessageUsageAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends MessageUsageAggregateArgs>(args: Subset<T, MessageUsageAggregateArgs>): Prisma.PrismaPromise<GetMessageUsageAggregateType<T>>
-
-    /**
-     * Group by MessageUsage.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {MessageUsageGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends MessageUsageGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: MessageUsageGroupByArgs['orderBy'] }
-        : { orderBy?: MessageUsageGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, MessageUsageGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMessageUsageGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the MessageUsage model
-   */
-  readonly fields: MessageUsageFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for MessageUsage.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__MessageUsageClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the MessageUsage model
-   */
-  interface MessageUsageFieldRefs {
-    readonly id: FieldRef<"MessageUsage", 'String'>
-    readonly userId: FieldRef<"MessageUsage", 'String'>
-    readonly regularMessages: FieldRef<"MessageUsage", 'Int'>
-    readonly premiumMessages: FieldRef<"MessageUsage", 'Int'>
-    readonly resetDate: FieldRef<"MessageUsage", 'DateTime'>
-    readonly createdAt: FieldRef<"MessageUsage", 'DateTime'>
-    readonly updatedAt: FieldRef<"MessageUsage", 'DateTime'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * MessageUsage findUnique
-   */
-  export type MessageUsageFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MessageUsage
-     */
-    select?: MessageUsageSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MessageUsage
-     */
-    omit?: MessageUsageOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MessageUsageInclude<ExtArgs> | null
-    /**
-     * Filter, which MessageUsage to fetch.
-     */
-    where: MessageUsageWhereUniqueInput
-  }
-
-  /**
-   * MessageUsage findUniqueOrThrow
-   */
-  export type MessageUsageFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MessageUsage
-     */
-    select?: MessageUsageSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MessageUsage
-     */
-    omit?: MessageUsageOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MessageUsageInclude<ExtArgs> | null
-    /**
-     * Filter, which MessageUsage to fetch.
-     */
-    where: MessageUsageWhereUniqueInput
-  }
-
-  /**
-   * MessageUsage findFirst
-   */
-  export type MessageUsageFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MessageUsage
-     */
-    select?: MessageUsageSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MessageUsage
-     */
-    omit?: MessageUsageOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MessageUsageInclude<ExtArgs> | null
-    /**
-     * Filter, which MessageUsage to fetch.
-     */
-    where?: MessageUsageWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of MessageUsages to fetch.
-     */
-    orderBy?: MessageUsageOrderByWithRelationInput | MessageUsageOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for MessageUsages.
-     */
-    cursor?: MessageUsageWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` MessageUsages from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` MessageUsages.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of MessageUsages.
-     */
-    distinct?: MessageUsageScalarFieldEnum | MessageUsageScalarFieldEnum[]
-  }
-
-  /**
-   * MessageUsage findFirstOrThrow
-   */
-  export type MessageUsageFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MessageUsage
-     */
-    select?: MessageUsageSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MessageUsage
-     */
-    omit?: MessageUsageOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MessageUsageInclude<ExtArgs> | null
-    /**
-     * Filter, which MessageUsage to fetch.
-     */
-    where?: MessageUsageWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of MessageUsages to fetch.
-     */
-    orderBy?: MessageUsageOrderByWithRelationInput | MessageUsageOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for MessageUsages.
-     */
-    cursor?: MessageUsageWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` MessageUsages from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` MessageUsages.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of MessageUsages.
-     */
-    distinct?: MessageUsageScalarFieldEnum | MessageUsageScalarFieldEnum[]
-  }
-
-  /**
-   * MessageUsage findMany
-   */
-  export type MessageUsageFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MessageUsage
-     */
-    select?: MessageUsageSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MessageUsage
-     */
-    omit?: MessageUsageOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MessageUsageInclude<ExtArgs> | null
-    /**
-     * Filter, which MessageUsages to fetch.
-     */
-    where?: MessageUsageWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of MessageUsages to fetch.
-     */
-    orderBy?: MessageUsageOrderByWithRelationInput | MessageUsageOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing MessageUsages.
-     */
-    cursor?: MessageUsageWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` MessageUsages from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` MessageUsages.
-     */
-    skip?: number
-    distinct?: MessageUsageScalarFieldEnum | MessageUsageScalarFieldEnum[]
-  }
-
-  /**
-   * MessageUsage create
-   */
-  export type MessageUsageCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MessageUsage
-     */
-    select?: MessageUsageSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MessageUsage
-     */
-    omit?: MessageUsageOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MessageUsageInclude<ExtArgs> | null
-    /**
-     * The data needed to create a MessageUsage.
-     */
-    data: XOR<MessageUsageCreateInput, MessageUsageUncheckedCreateInput>
-  }
-
-  /**
-   * MessageUsage createMany
-   */
-  export type MessageUsageCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many MessageUsages.
-     */
-    data: MessageUsageCreateManyInput | MessageUsageCreateManyInput[]
-  }
-
-  /**
-   * MessageUsage createManyAndReturn
-   */
-  export type MessageUsageCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MessageUsage
-     */
-    select?: MessageUsageSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the MessageUsage
-     */
-    omit?: MessageUsageOmit<ExtArgs> | null
-    /**
-     * The data used to create many MessageUsages.
-     */
-    data: MessageUsageCreateManyInput | MessageUsageCreateManyInput[]
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MessageUsageIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * MessageUsage update
-   */
-  export type MessageUsageUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MessageUsage
-     */
-    select?: MessageUsageSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MessageUsage
-     */
-    omit?: MessageUsageOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MessageUsageInclude<ExtArgs> | null
-    /**
-     * The data needed to update a MessageUsage.
-     */
-    data: XOR<MessageUsageUpdateInput, MessageUsageUncheckedUpdateInput>
-    /**
-     * Choose, which MessageUsage to update.
-     */
-    where: MessageUsageWhereUniqueInput
-  }
-
-  /**
-   * MessageUsage updateMany
-   */
-  export type MessageUsageUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update MessageUsages.
-     */
-    data: XOR<MessageUsageUpdateManyMutationInput, MessageUsageUncheckedUpdateManyInput>
-    /**
-     * Filter which MessageUsages to update
-     */
-    where?: MessageUsageWhereInput
-    /**
-     * Limit how many MessageUsages to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * MessageUsage updateManyAndReturn
-   */
-  export type MessageUsageUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MessageUsage
-     */
-    select?: MessageUsageSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the MessageUsage
-     */
-    omit?: MessageUsageOmit<ExtArgs> | null
-    /**
-     * The data used to update MessageUsages.
-     */
-    data: XOR<MessageUsageUpdateManyMutationInput, MessageUsageUncheckedUpdateManyInput>
-    /**
-     * Filter which MessageUsages to update
-     */
-    where?: MessageUsageWhereInput
-    /**
-     * Limit how many MessageUsages to update.
-     */
-    limit?: number
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MessageUsageIncludeUpdateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * MessageUsage upsert
-   */
-  export type MessageUsageUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MessageUsage
-     */
-    select?: MessageUsageSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MessageUsage
-     */
-    omit?: MessageUsageOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MessageUsageInclude<ExtArgs> | null
-    /**
-     * The filter to search for the MessageUsage to update in case it exists.
-     */
-    where: MessageUsageWhereUniqueInput
-    /**
-     * In case the MessageUsage found by the `where` argument doesn't exist, create a new MessageUsage with this data.
-     */
-    create: XOR<MessageUsageCreateInput, MessageUsageUncheckedCreateInput>
-    /**
-     * In case the MessageUsage was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<MessageUsageUpdateInput, MessageUsageUncheckedUpdateInput>
-  }
-
-  /**
-   * MessageUsage delete
-   */
-  export type MessageUsageDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MessageUsage
-     */
-    select?: MessageUsageSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MessageUsage
-     */
-    omit?: MessageUsageOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MessageUsageInclude<ExtArgs> | null
-    /**
-     * Filter which MessageUsage to delete.
-     */
-    where: MessageUsageWhereUniqueInput
-  }
-
-  /**
-   * MessageUsage deleteMany
-   */
-  export type MessageUsageDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which MessageUsages to delete
-     */
-    where?: MessageUsageWhereInput
-    /**
-     * Limit how many MessageUsages to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * MessageUsage without action
-   */
-  export type MessageUsageDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MessageUsage
-     */
-    select?: MessageUsageSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MessageUsage
-     */
-    omit?: MessageUsageOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MessageUsageInclude<ExtArgs> | null
   }
 
 
@@ -4367,23 +3128,13 @@ export namespace Prisma {
     imageUrl: 'imageUrl',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
-    subscriptionTier: 'subscriptionTier'
+    subscriptionTier: 'subscriptionTier',
+    regularMessages: 'regularMessages',
+    premiumMessages: 'premiumMessages',
+    resetDate: 'resetDate'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
-
-
-  export const MessageUsageScalarFieldEnum: {
-    id: 'id',
-    userId: 'userId',
-    regularMessages: 'regularMessages',
-    premiumMessages: 'premiumMessages',
-    resetDate: 'resetDate',
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
-  };
-
-  export type MessageUsageScalarFieldEnum = (typeof MessageUsageScalarFieldEnum)[keyof typeof MessageUsageScalarFieldEnum]
 
 
   export const AnonymousUsageScalarFieldEnum: {
@@ -4462,7 +3213,9 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     subscriptionTier?: StringFilter<"User"> | string
-    messageUsage?: MessageUsageListRelationFilter
+    regularMessages?: IntFilter<"User"> | number
+    premiumMessages?: IntFilter<"User"> | number
+    resetDate?: DateTimeFilter<"User"> | Date | string
   }
 
   export type UserOrderByWithRelationInput = {
@@ -4474,7 +3227,9 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     subscriptionTier?: SortOrder
-    messageUsage?: MessageUsageOrderByRelationAggregateInput
+    regularMessages?: SortOrder
+    premiumMessages?: SortOrder
+    resetDate?: SortOrder
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -4489,7 +3244,9 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     subscriptionTier?: StringFilter<"User"> | string
-    messageUsage?: MessageUsageListRelationFilter
+    regularMessages?: IntFilter<"User"> | number
+    premiumMessages?: IntFilter<"User"> | number
+    resetDate?: DateTimeFilter<"User"> | Date | string
   }, "id" | "clerkId">
 
   export type UserOrderByWithAggregationInput = {
@@ -4501,9 +3258,14 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     subscriptionTier?: SortOrder
+    regularMessages?: SortOrder
+    premiumMessages?: SortOrder
+    resetDate?: SortOrder
     _count?: UserCountOrderByAggregateInput
+    _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
+    _sum?: UserSumOrderByAggregateInput
   }
 
   export type UserScalarWhereWithAggregatesInput = {
@@ -4518,73 +3280,9 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     subscriptionTier?: StringWithAggregatesFilter<"User"> | string
-  }
-
-  export type MessageUsageWhereInput = {
-    AND?: MessageUsageWhereInput | MessageUsageWhereInput[]
-    OR?: MessageUsageWhereInput[]
-    NOT?: MessageUsageWhereInput | MessageUsageWhereInput[]
-    id?: StringFilter<"MessageUsage"> | string
-    userId?: StringFilter<"MessageUsage"> | string
-    regularMessages?: IntFilter<"MessageUsage"> | number
-    premiumMessages?: IntFilter<"MessageUsage"> | number
-    resetDate?: DateTimeFilter<"MessageUsage"> | Date | string
-    createdAt?: DateTimeFilter<"MessageUsage"> | Date | string
-    updatedAt?: DateTimeFilter<"MessageUsage"> | Date | string
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
-  }
-
-  export type MessageUsageOrderByWithRelationInput = {
-    id?: SortOrder
-    userId?: SortOrder
-    regularMessages?: SortOrder
-    premiumMessages?: SortOrder
-    resetDate?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-    user?: UserOrderByWithRelationInput
-  }
-
-  export type MessageUsageWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    AND?: MessageUsageWhereInput | MessageUsageWhereInput[]
-    OR?: MessageUsageWhereInput[]
-    NOT?: MessageUsageWhereInput | MessageUsageWhereInput[]
-    userId?: StringFilter<"MessageUsage"> | string
-    regularMessages?: IntFilter<"MessageUsage"> | number
-    premiumMessages?: IntFilter<"MessageUsage"> | number
-    resetDate?: DateTimeFilter<"MessageUsage"> | Date | string
-    createdAt?: DateTimeFilter<"MessageUsage"> | Date | string
-    updatedAt?: DateTimeFilter<"MessageUsage"> | Date | string
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
-  }, "id">
-
-  export type MessageUsageOrderByWithAggregationInput = {
-    id?: SortOrder
-    userId?: SortOrder
-    regularMessages?: SortOrder
-    premiumMessages?: SortOrder
-    resetDate?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-    _count?: MessageUsageCountOrderByAggregateInput
-    _avg?: MessageUsageAvgOrderByAggregateInput
-    _max?: MessageUsageMaxOrderByAggregateInput
-    _min?: MessageUsageMinOrderByAggregateInput
-    _sum?: MessageUsageSumOrderByAggregateInput
-  }
-
-  export type MessageUsageScalarWhereWithAggregatesInput = {
-    AND?: MessageUsageScalarWhereWithAggregatesInput | MessageUsageScalarWhereWithAggregatesInput[]
-    OR?: MessageUsageScalarWhereWithAggregatesInput[]
-    NOT?: MessageUsageScalarWhereWithAggregatesInput | MessageUsageScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"MessageUsage"> | string
-    userId?: StringWithAggregatesFilter<"MessageUsage"> | string
-    regularMessages?: IntWithAggregatesFilter<"MessageUsage"> | number
-    premiumMessages?: IntWithAggregatesFilter<"MessageUsage"> | number
-    resetDate?: DateTimeWithAggregatesFilter<"MessageUsage"> | Date | string
-    createdAt?: DateTimeWithAggregatesFilter<"MessageUsage"> | Date | string
-    updatedAt?: DateTimeWithAggregatesFilter<"MessageUsage"> | Date | string
+    regularMessages?: IntWithAggregatesFilter<"User"> | number
+    premiumMessages?: IntWithAggregatesFilter<"User"> | number
+    resetDate?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
 
   export type AnonymousUsageWhereInput = {
@@ -4655,7 +3353,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     subscriptionTier?: string
-    messageUsage?: MessageUsageCreateNestedManyWithoutUserInput
+    regularMessages?: number
+    premiumMessages?: number
+    resetDate?: Date | string
   }
 
   export type UserUncheckedCreateInput = {
@@ -4667,7 +3367,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     subscriptionTier?: string
-    messageUsage?: MessageUsageUncheckedCreateNestedManyWithoutUserInput
+    regularMessages?: number
+    premiumMessages?: number
+    resetDate?: Date | string
   }
 
   export type UserUpdateInput = {
@@ -4679,7 +3381,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscriptionTier?: StringFieldUpdateOperationsInput | string
-    messageUsage?: MessageUsageUpdateManyWithoutUserNestedInput
+    regularMessages?: IntFieldUpdateOperationsInput | number
+    premiumMessages?: IntFieldUpdateOperationsInput | number
+    resetDate?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type UserUncheckedUpdateInput = {
@@ -4691,7 +3395,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscriptionTier?: StringFieldUpdateOperationsInput | string
-    messageUsage?: MessageUsageUncheckedUpdateManyWithoutUserNestedInput
+    regularMessages?: IntFieldUpdateOperationsInput | number
+    premiumMessages?: IntFieldUpdateOperationsInput | number
+    resetDate?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type UserCreateManyInput = {
@@ -4703,6 +3409,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     subscriptionTier?: string
+    regularMessages?: number
+    premiumMessages?: number
+    resetDate?: Date | string
   }
 
   export type UserUpdateManyMutationInput = {
@@ -4714,6 +3423,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscriptionTier?: StringFieldUpdateOperationsInput | string
+    regularMessages?: IntFieldUpdateOperationsInput | number
+    premiumMessages?: IntFieldUpdateOperationsInput | number
+    resetDate?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -4725,75 +3437,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscriptionTier?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type MessageUsageCreateInput = {
-    id?: string
-    regularMessages?: number
-    premiumMessages?: number
-    resetDate: Date | string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutMessageUsageInput
-  }
-
-  export type MessageUsageUncheckedCreateInput = {
-    id?: string
-    userId: string
-    regularMessages?: number
-    premiumMessages?: number
-    resetDate: Date | string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type MessageUsageUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
     regularMessages?: IntFieldUpdateOperationsInput | number
     premiumMessages?: IntFieldUpdateOperationsInput | number
     resetDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutMessageUsageNestedInput
-  }
-
-  export type MessageUsageUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    regularMessages?: IntFieldUpdateOperationsInput | number
-    premiumMessages?: IntFieldUpdateOperationsInput | number
-    resetDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type MessageUsageCreateManyInput = {
-    id?: string
-    userId: string
-    regularMessages?: number
-    premiumMessages?: number
-    resetDate: Date | string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type MessageUsageUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    regularMessages?: IntFieldUpdateOperationsInput | number
-    premiumMessages?: IntFieldUpdateOperationsInput | number
-    resetDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type MessageUsageUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    regularMessages?: IntFieldUpdateOperationsInput | number
-    premiumMessages?: IntFieldUpdateOperationsInput | number
-    resetDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AnonymousUsageCreateInput = {
@@ -4898,19 +3544,20 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
-  export type MessageUsageListRelationFilter = {
-    every?: MessageUsageWhereInput
-    some?: MessageUsageWhereInput
-    none?: MessageUsageWhereInput
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
   }
 
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
-  }
-
-  export type MessageUsageOrderByRelationAggregateInput = {
-    _count?: SortOrder
   }
 
   export type UserCountOrderByAggregateInput = {
@@ -4922,6 +3569,14 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     subscriptionTier?: SortOrder
+    regularMessages?: SortOrder
+    premiumMessages?: SortOrder
+    resetDate?: SortOrder
+  }
+
+  export type UserAvgOrderByAggregateInput = {
+    regularMessages?: SortOrder
+    premiumMessages?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -4933,6 +3588,9 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     subscriptionTier?: SortOrder
+    regularMessages?: SortOrder
+    premiumMessages?: SortOrder
+    resetDate?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -4944,6 +3602,14 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     subscriptionTier?: SortOrder
+    regularMessages?: SortOrder
+    premiumMessages?: SortOrder
+    resetDate?: SortOrder
+  }
+
+  export type UserSumOrderByAggregateInput = {
+    regularMessages?: SortOrder
+    premiumMessages?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -4992,62 +3658,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
-  }
-
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
-  export type UserScalarRelationFilter = {
-    is?: UserWhereInput
-    isNot?: UserWhereInput
-  }
-
-  export type MessageUsageCountOrderByAggregateInput = {
-    id?: SortOrder
-    userId?: SortOrder
-    regularMessages?: SortOrder
-    premiumMessages?: SortOrder
-    resetDate?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type MessageUsageAvgOrderByAggregateInput = {
-    regularMessages?: SortOrder
-    premiumMessages?: SortOrder
-  }
-
-  export type MessageUsageMaxOrderByAggregateInput = {
-    id?: SortOrder
-    userId?: SortOrder
-    regularMessages?: SortOrder
-    premiumMessages?: SortOrder
-    resetDate?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type MessageUsageMinOrderByAggregateInput = {
-    id?: SortOrder
-    userId?: SortOrder
-    regularMessages?: SortOrder
-    premiumMessages?: SortOrder
-    resetDate?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type MessageUsageSumOrderByAggregateInput = {
-    regularMessages?: SortOrder
-    premiumMessages?: SortOrder
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -5101,20 +3711,6 @@ export namespace Prisma {
     messageCount?: SortOrder
   }
 
-  export type MessageUsageCreateNestedManyWithoutUserInput = {
-    create?: XOR<MessageUsageCreateWithoutUserInput, MessageUsageUncheckedCreateWithoutUserInput> | MessageUsageCreateWithoutUserInput[] | MessageUsageUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: MessageUsageCreateOrConnectWithoutUserInput | MessageUsageCreateOrConnectWithoutUserInput[]
-    createMany?: MessageUsageCreateManyUserInputEnvelope
-    connect?: MessageUsageWhereUniqueInput | MessageUsageWhereUniqueInput[]
-  }
-
-  export type MessageUsageUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<MessageUsageCreateWithoutUserInput, MessageUsageUncheckedCreateWithoutUserInput> | MessageUsageCreateWithoutUserInput[] | MessageUsageUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: MessageUsageCreateOrConnectWithoutUserInput | MessageUsageCreateOrConnectWithoutUserInput[]
-    createMany?: MessageUsageCreateManyUserInputEnvelope
-    connect?: MessageUsageWhereUniqueInput | MessageUsageWhereUniqueInput[]
-  }
-
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
@@ -5127,54 +3723,12 @@ export namespace Prisma {
     set?: Date | string
   }
 
-  export type MessageUsageUpdateManyWithoutUserNestedInput = {
-    create?: XOR<MessageUsageCreateWithoutUserInput, MessageUsageUncheckedCreateWithoutUserInput> | MessageUsageCreateWithoutUserInput[] | MessageUsageUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: MessageUsageCreateOrConnectWithoutUserInput | MessageUsageCreateOrConnectWithoutUserInput[]
-    upsert?: MessageUsageUpsertWithWhereUniqueWithoutUserInput | MessageUsageUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: MessageUsageCreateManyUserInputEnvelope
-    set?: MessageUsageWhereUniqueInput | MessageUsageWhereUniqueInput[]
-    disconnect?: MessageUsageWhereUniqueInput | MessageUsageWhereUniqueInput[]
-    delete?: MessageUsageWhereUniqueInput | MessageUsageWhereUniqueInput[]
-    connect?: MessageUsageWhereUniqueInput | MessageUsageWhereUniqueInput[]
-    update?: MessageUsageUpdateWithWhereUniqueWithoutUserInput | MessageUsageUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: MessageUsageUpdateManyWithWhereWithoutUserInput | MessageUsageUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: MessageUsageScalarWhereInput | MessageUsageScalarWhereInput[]
-  }
-
-  export type MessageUsageUncheckedUpdateManyWithoutUserNestedInput = {
-    create?: XOR<MessageUsageCreateWithoutUserInput, MessageUsageUncheckedCreateWithoutUserInput> | MessageUsageCreateWithoutUserInput[] | MessageUsageUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: MessageUsageCreateOrConnectWithoutUserInput | MessageUsageCreateOrConnectWithoutUserInput[]
-    upsert?: MessageUsageUpsertWithWhereUniqueWithoutUserInput | MessageUsageUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: MessageUsageCreateManyUserInputEnvelope
-    set?: MessageUsageWhereUniqueInput | MessageUsageWhereUniqueInput[]
-    disconnect?: MessageUsageWhereUniqueInput | MessageUsageWhereUniqueInput[]
-    delete?: MessageUsageWhereUniqueInput | MessageUsageWhereUniqueInput[]
-    connect?: MessageUsageWhereUniqueInput | MessageUsageWhereUniqueInput[]
-    update?: MessageUsageUpdateWithWhereUniqueWithoutUserInput | MessageUsageUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: MessageUsageUpdateManyWithWhereWithoutUserInput | MessageUsageUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: MessageUsageScalarWhereInput | MessageUsageScalarWhereInput[]
-  }
-
-  export type UserCreateNestedOneWithoutMessageUsageInput = {
-    create?: XOR<UserCreateWithoutMessageUsageInput, UserUncheckedCreateWithoutMessageUsageInput>
-    connectOrCreate?: UserCreateOrConnectWithoutMessageUsageInput
-    connect?: UserWhereUniqueInput
-  }
-
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
     decrement?: number
     multiply?: number
     divide?: number
-  }
-
-  export type UserUpdateOneRequiredWithoutMessageUsageNestedInput = {
-    create?: XOR<UserCreateWithoutMessageUsageInput, UserUncheckedCreateWithoutMessageUsageInput>
-    connectOrCreate?: UserCreateOrConnectWithoutMessageUsageInput
-    upsert?: UserUpsertWithoutMessageUsageInput
-    connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutMessageUsageInput, UserUpdateWithoutMessageUsageInput>, UserUncheckedUpdateWithoutMessageUsageInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -5216,6 +3770,17 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
+  export type NestedIntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[]
@@ -5231,17 +3796,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
     _max?: NestedStringFilter<$PrismaModel>
-  }
-
-  export type NestedIntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
   }
 
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -5311,158 +3865,6 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
-  }
-
-  export type MessageUsageCreateWithoutUserInput = {
-    id?: string
-    regularMessages?: number
-    premiumMessages?: number
-    resetDate: Date | string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type MessageUsageUncheckedCreateWithoutUserInput = {
-    id?: string
-    regularMessages?: number
-    premiumMessages?: number
-    resetDate: Date | string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type MessageUsageCreateOrConnectWithoutUserInput = {
-    where: MessageUsageWhereUniqueInput
-    create: XOR<MessageUsageCreateWithoutUserInput, MessageUsageUncheckedCreateWithoutUserInput>
-  }
-
-  export type MessageUsageCreateManyUserInputEnvelope = {
-    data: MessageUsageCreateManyUserInput | MessageUsageCreateManyUserInput[]
-  }
-
-  export type MessageUsageUpsertWithWhereUniqueWithoutUserInput = {
-    where: MessageUsageWhereUniqueInput
-    update: XOR<MessageUsageUpdateWithoutUserInput, MessageUsageUncheckedUpdateWithoutUserInput>
-    create: XOR<MessageUsageCreateWithoutUserInput, MessageUsageUncheckedCreateWithoutUserInput>
-  }
-
-  export type MessageUsageUpdateWithWhereUniqueWithoutUserInput = {
-    where: MessageUsageWhereUniqueInput
-    data: XOR<MessageUsageUpdateWithoutUserInput, MessageUsageUncheckedUpdateWithoutUserInput>
-  }
-
-  export type MessageUsageUpdateManyWithWhereWithoutUserInput = {
-    where: MessageUsageScalarWhereInput
-    data: XOR<MessageUsageUpdateManyMutationInput, MessageUsageUncheckedUpdateManyWithoutUserInput>
-  }
-
-  export type MessageUsageScalarWhereInput = {
-    AND?: MessageUsageScalarWhereInput | MessageUsageScalarWhereInput[]
-    OR?: MessageUsageScalarWhereInput[]
-    NOT?: MessageUsageScalarWhereInput | MessageUsageScalarWhereInput[]
-    id?: StringFilter<"MessageUsage"> | string
-    userId?: StringFilter<"MessageUsage"> | string
-    regularMessages?: IntFilter<"MessageUsage"> | number
-    premiumMessages?: IntFilter<"MessageUsage"> | number
-    resetDate?: DateTimeFilter<"MessageUsage"> | Date | string
-    createdAt?: DateTimeFilter<"MessageUsage"> | Date | string
-    updatedAt?: DateTimeFilter<"MessageUsage"> | Date | string
-  }
-
-  export type UserCreateWithoutMessageUsageInput = {
-    id?: string
-    clerkId: string
-    email?: string | null
-    name?: string | null
-    imageUrl?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    subscriptionTier?: string
-  }
-
-  export type UserUncheckedCreateWithoutMessageUsageInput = {
-    id?: string
-    clerkId: string
-    email?: string | null
-    name?: string | null
-    imageUrl?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    subscriptionTier?: string
-  }
-
-  export type UserCreateOrConnectWithoutMessageUsageInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutMessageUsageInput, UserUncheckedCreateWithoutMessageUsageInput>
-  }
-
-  export type UserUpsertWithoutMessageUsageInput = {
-    update: XOR<UserUpdateWithoutMessageUsageInput, UserUncheckedUpdateWithoutMessageUsageInput>
-    create: XOR<UserCreateWithoutMessageUsageInput, UserUncheckedCreateWithoutMessageUsageInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutMessageUsageInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutMessageUsageInput, UserUncheckedUpdateWithoutMessageUsageInput>
-  }
-
-  export type UserUpdateWithoutMessageUsageInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    clerkId?: StringFieldUpdateOperationsInput | string
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    name?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    subscriptionTier?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type UserUncheckedUpdateWithoutMessageUsageInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    clerkId?: StringFieldUpdateOperationsInput | string
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    name?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    subscriptionTier?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type MessageUsageCreateManyUserInput = {
-    id?: string
-    regularMessages?: number
-    premiumMessages?: number
-    resetDate: Date | string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type MessageUsageUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    regularMessages?: IntFieldUpdateOperationsInput | number
-    premiumMessages?: IntFieldUpdateOperationsInput | number
-    resetDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type MessageUsageUncheckedUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    regularMessages?: IntFieldUpdateOperationsInput | number
-    premiumMessages?: IntFieldUpdateOperationsInput | number
-    resetDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type MessageUsageUncheckedUpdateManyWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    regularMessages?: IntFieldUpdateOperationsInput | number
-    premiumMessages?: IntFieldUpdateOperationsInput | number
-    resetDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 
