@@ -39,3 +39,27 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Database files (security)
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+/prisma/dev.db*
+/prisma/test.db*
+/prisma/lib/generated/prisma/dev.db*
+dev.db*
+test.db*
+
+# Log files (may contain sensitive information)
+*.log
+logs/
+
+# Backup files
+*.backup
+*.bak
+*.tmp
+
+# Security scan results
+.security-scan-results/
+security-report.*
