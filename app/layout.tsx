@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Chat0',
+  title: 'B-Chat',
   description: 'Fastest AI Chat App',
 };
 
