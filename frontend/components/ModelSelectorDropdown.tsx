@@ -164,10 +164,10 @@ export default function ModelSelectorDropdown({ trigger }: ModelSelectorDropdown
     const defaultTrigger = trigger || (
     <Button
       variant="ghost"
-      className="flex items-center gap-2 h-8 px-3 text-xs rounded-md text-foreground hover:bg-primary/10"
+      className="flex items-center gap-2 h-8 px-3 text-xs rounded-md text-foreground hover:bg-primary/40 hover:text-primary-foreground transition-all duration-200 hover:shadow-md hover:border-primary/50 border border-transparent"
     >
       <span>{selectedModel}</span>
-      <ChevronDown className="w-3 h-3 opacity-50" />
+      <ChevronDown className="w-3 h-3 opacity-50 transition-opacity hover:opacity-90" />
     </Button>
   );
 

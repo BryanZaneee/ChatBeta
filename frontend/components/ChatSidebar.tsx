@@ -92,7 +92,7 @@ function PureHeader() {
         to="/chat"
         className={buttonVariants({
           variant: 'default',
-          className: 'w-full',
+          className: 'w-full bg-blue-600 text-white active:bg-blue-500 focus:bg-blue-500 transition-colors duration-200 dark:bg-blue-700 dark:active:bg-blue-600 dark:focus:bg-blue-600',
         })}
       >
         New Chat

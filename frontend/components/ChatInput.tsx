@@ -176,7 +176,7 @@ function PureChatInput({
 
   // Calculate positioning based on sidebar state
   const containerStyles = useMemo(() => {
-    const sidebarWidth = 304; // 19rem = 304px
+    const sidebarWidth = 224; // 14rem = 224px (reduced from 19rem/304px)
     const rightMargin = 10; // 10px as requested
     const maxContentWidth = 768; // 3xl = 48rem = 768px
     
@@ -200,7 +200,7 @@ function PureChatInput({
         maxWidth: shouldShrink ? `${availableWidth}px` : 'none'
       };
     }
-  }, [isMobile, state, isSmallScreen, windowWidth]); // Add dependencies for recalculation
+  }, [isMobile, state, isSmallScreen, windowWidth]);
 
   return (
     <div 
@@ -294,6 +294,7 @@ const PureSendButton = ({ onSubmit, disabled }: SendButtonProps) => {
       size="icon"
       disabled={disabled}
       aria-label="Send message"
+      className="bg-blue-600 text-white active:bg-blue-500 focus:bg-blue-500 transition-colors duration-200 dark:bg-blue-700 dark:active:bg-blue-600 dark:focus:bg-blue-600 disabled:bg-muted"
     >
       <ArrowUpIcon size={18} />
     </Button>

@@ -27,12 +27,12 @@ function CodeBlock({ children, className, ...props }: CodeComponentProps) {
   if (match) {
     const lang = match[1];
     return (
-      <div className="rounded-none">
+      <div className="code-block-container my-4">
         <Codebar lang={lang} codeString={String(children)} />
         <ShikiHighlighter
           language={lang}
-          theme={'material-theme-darker'}
-          className="text-sm font-mono rounded-full"
+          theme={'material-theme-lighter'}
+          className="text-sm font-mono"
           showLanguage={false}
         >
           {String(children)}
@@ -43,8 +43,8 @@ function CodeBlock({ children, className, ...props }: CodeComponentProps) {
 
   const inlineCodeClasses =
     size === 'small'
-      ? 'mx-0.5 overflow-auto rounded-md px-1 py-0.5 bg-primary/10 text-foreground font-mono text-xs'
-      : 'mx-0.5 overflow-auto rounded-md px-2 py-1 bg-primary/10 text-foreground font-mono';
+      ? 'inline-code-blue text-xs'
+      : 'inline-code-blue';
 
   return (
     <code className={inlineCodeClasses} {...props}>
@@ -69,9 +69,9 @@ function Codebar({ lang, codeString }: { lang: string; codeString: string }) {
   };
 
   return (
-    <div className="flex justify-between items-center px-4 py-2 bg-secondary text-foreground rounded-t-md">
+    <div className="code-block-header flex justify-between items-center px-4 py-2 text-foreground">
       <span className="text-sm font-mono">{lang}</span>
-      <button onClick={copyToClipboard} className="text-sm cursor-pointer">
+      <button onClick={copyToClipboard} className="text-sm cursor-pointer hover:opacity-70 transition-opacity">
         {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
       </button>
     </div>
