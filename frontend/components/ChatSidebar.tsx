@@ -84,7 +84,7 @@ export default function ChatSidebar() {
 function PureHeader() {
   return (
     <SidebarHeader className="flex justify-between items-center gap-4 relative">
-      <SidebarTrigger className="absolute right-1 top-2.5" />
+      <SidebarTrigger className="absolute right-1 top-2.5 md:flex hidden" />
       <h1 className="text-2xl font-bold">
         Chat<span className="">0</span>
       </h1>

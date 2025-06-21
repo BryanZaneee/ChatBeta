@@ -41,9 +41,20 @@ export default function useAutoResizeTextarea({
   }, [minHeight]);
 
   useEffect(() => {
-    const handleResize = () => adjustHeight();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    let timeoutId: NodeJS.Timeout;
+    
+    const debouncedResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        adjustHeight();
+      }, 100); // Debounce for 100ms to prevent excessive calls
+    };
+
+    window.addEventListener('resize', debouncedResize);
+    return () => {
+      window.removeEventListener('resize', debouncedResize);
+      clearTimeout(timeoutId);
+    };
   }, [adjustHeight]);
 
   return { textareaRef, adjustHeight };

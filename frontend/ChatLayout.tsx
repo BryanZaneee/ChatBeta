@@ -6,7 +6,7 @@ export default function ChatLayout() {
   return (
     <SidebarProvider>
       <ChatSidebar />
-      <div className="flex-1 relative">
+      <div className="flex-1 relative min-h-screen w-full overflow-hidden">
         <Outlet />
       </div>
     </SidebarProvider>

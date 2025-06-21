@@ -7,6 +7,7 @@ import { Button } from '@/frontend/components/ui/button';
 import { Badge } from '@/frontend/components/ui/badge';
 import { Input } from '@/frontend/components/ui/input';
 import { toast } from 'sonner';
+import { SidebarTrigger, useSidebar } from '../components/ui/sidebar';
 
 export default function Settings() {
   const { 
@@ -156,6 +157,7 @@ export default function Settings() {
 
   return (
     <section className="flex w-full h-full">
+      <SettingsSidebarTrigger />
       <Link
         to="/chat"
         className={buttonVariants({
@@ -166,8 +168,8 @@ export default function Settings() {
         <ArrowLeftIcon className="w-4 h-4" />
         Back to Chat
       </Link>
-      <div className="flex items-center justify-center w-full h-full pt-24 pb-44 mx-auto">
-        <div className="space-y-8 max-w-2xl">
+      <div className="flex items-center justify-center w-full h-full pt-24 pb-44 mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="space-y-8 max-w-2xl w-full">
           
           {/* Debug: Tier Toggle */}
           <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
@@ -378,3 +380,14 @@ export default function Settings() {
     </section>
   );
 }
+
+const SettingsSidebarTrigger = () => {
+  const { state, isMobile } = useSidebar();
+  
+  // On mobile, always show the trigger (sidebar uses Sheet overlay)
+  // On desktop, only show when sidebar is collapsed
+  if (isMobile || state === 'collapsed') {
+    return <SidebarTrigger className="fixed left-4 top-4 z-100" />;
+  }
+  return null;
+};

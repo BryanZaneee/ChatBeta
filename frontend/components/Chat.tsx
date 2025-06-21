@@ -153,10 +153,10 @@ export default function Chat({ threadId, initialMessages }: ChatProps) {
   }, [status, isCurrentlyReasoning]);
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full min-h-screen">
       <ChatSidebarTrigger />
       <main
-        className={`flex flex-col w-full max-w-3xl pt-10 pb-44 mx-auto transition-all duration-300 ease-in-out`}
+        className={`flex flex-col w-full max-w-3xl pt-10 pb-44 mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 ease-in-out`}
       >
         <Messages
           threadId={threadId}
@@ -204,8 +204,11 @@ export default function Chat({ threadId, initialMessages }: ChatProps) {
 }
 
 const ChatSidebarTrigger = () => {
-  const { state } = useSidebar();
-  if (state === 'collapsed') {
+  const { state, isMobile } = useSidebar();
+  
+  // On mobile, always show the trigger (sidebar uses Sheet overlay)
+  // On desktop, only show when sidebar is collapsed
+  if (isMobile || state === 'collapsed') {
     return <SidebarTrigger className="fixed left-4 top-4 z-100" />;
   }
   return null;

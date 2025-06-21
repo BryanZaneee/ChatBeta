@@ -1,5 +1,5 @@
 import { ArrowUpIcon } from 'lucide-react';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo, useState, useEffect } from 'react';
 import { Textarea } from '@/frontend/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { Button } from '@/frontend/components/ui/button';
@@ -17,6 +17,8 @@ import { StopIcon } from './ui/icons';
 import { toast } from 'sonner';
 import { useMessageSummary } from '../hooks/useMessageSummary';
 import ModelSelectorDropdown from './ModelSelectorDropdown';
+import useResponsiveWidth from '@/hooks/useResponsiveWidth';
+import { useSidebar } from './ui/sidebar';
 
 interface ChatInputProps {
   threadId: string;
@@ -67,6 +69,27 @@ function PureChatInput({
 
   const navigate = useNavigate();
   const { id } = useParams();
+  const isSmallScreen = useResponsiveWidth(768);
+  const { state, isMobile } = useSidebar();
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  // Update window width on resize for dynamic positioning
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
+    const debouncedHandleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setWindowWidth(window.innerWidth);
+      }, 50); // Debounce for 50ms for smoother performance
+    };
+
+    window.addEventListener('resize', debouncedHandleResize);
+    return () => {
+      window.removeEventListener('resize', debouncedHandleResize);
+      clearTimeout(timeoutId);
+    };
+  }, []);
 
   const canSendMessage = useMemo(() => {
     checkAndResetIfNeeded();
@@ -151,9 +174,44 @@ function PureChatInput({
     adjustHeight();
   };
 
+  // Calculate positioning based on sidebar state
+  const containerStyles = useMemo(() => {
+    const sidebarWidth = 304; // 19rem = 304px
+    const rightMargin = 10; // 10px as requested
+    const maxContentWidth = 768; // 3xl = 48rem = 768px
+    
+    if (isMobile || state === 'collapsed') {
+      // On mobile or when sidebar is collapsed, use full width
+      return {
+        left: '0',
+        right: `${rightMargin}px`,
+        width: 'auto',
+        maxWidth: 'none'
+      };
+    } else {
+      // On desktop with expanded sidebar, calculate available width
+      const availableWidth = windowWidth - sidebarWidth - rightMargin;
+      const shouldShrink = availableWidth < maxContentWidth + 64; // Add padding buffer
+      
+      return {
+        left: `${sidebarWidth}px`,
+        right: `${rightMargin}px`,
+        width: 'auto',
+        maxWidth: shouldShrink ? `${availableWidth}px` : 'none'
+      };
+    }
+  }, [isMobile, state, isSmallScreen, windowWidth]); // Add dependencies for recalculation
+
   return (
-    <div className="fixed bottom-0 w-full max-w-3xl">
-      <div className="bg-secondary rounded-t-[20px] p-2 pb-0 w-full">
+    <div 
+      className="fixed bottom-0 flex justify-center transition-all duration-300 ease-in-out z-40"
+      style={containerStyles}
+    >
+      <div className={cn(
+        "w-full max-w-3xl mx-auto transition-all duration-300 ease-in-out",
+        isSmallScreen ? "px-2 sm:px-4" : "px-4 sm:px-6 lg:px-8"
+      )}>
+        <div className="bg-secondary rounded-t-[20px] p-2 pb-0 w-full">
         <div className="relative">
           <div className="flex flex-col">
             <div className="bg-secondary overflow-y-auto max-h-[300px]">
@@ -162,12 +220,13 @@ function PureChatInput({
                 value={input}
                 placeholder="What can I do for you?"
                 className={cn(
-                  'w-full px-4 py-3 border-none shadow-none dark:bg-transparent',
+                  'w-full border-none shadow-none dark:bg-transparent',
                   'placeholder:text-muted-foreground resize-none',
                   'focus-visible:ring-0 focus-visible:ring-offset-0',
                   'scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted-foreground/30',
                   'scrollbar-thumb-rounded-full',
-                  'min-h-[72px]'
+                  'min-h-[72px] transition-all duration-200 ease-in-out',
+                  isSmallScreen ? 'px-3 py-2 text-sm' : 'px-4 py-3 text-base'
                 )}
                 ref={textareaRef}
                 onKeyDown={handleKeyDown}
@@ -180,7 +239,10 @@ function PureChatInput({
               </span>
             </div>
 
-            <div className="h-14 flex items-center px-2">
+            <div className={cn(
+              "flex items-center transition-all duration-200 ease-in-out",
+              isSmallScreen ? "h-12 px-1" : "h-14 px-2"
+            )}>
               <div className="flex items-center justify-between w-full">
                 <ChatModelSelector />
 
@@ -194,6 +256,7 @@ function PureChatInput({
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }
